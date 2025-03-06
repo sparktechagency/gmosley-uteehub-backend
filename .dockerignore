@@ -1,0 +1,9 @@
+node_modules
+dist
+uploads
+.git
+.gitignore
+.env  # We ignore this so it is not inside the container
+logs/
+*.log
+
