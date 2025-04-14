@@ -51,30 +51,30 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-  deploy:
-    name: Deploy to AWS EC2
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+  # deploy:
+  #   name: Deploy to AWS EC2
+  #   runs-on: ubuntu-latest
+  #   needs: [build]
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
 
-      - name: Deploy via SSH to EC2
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "."
-          target: "/home/${{ secrets.EC2_USER }}/ts-node-server"
+  #     - name: Deploy via SSH to EC2
+  #       uses: appleboy/scp-action@v0.1.4
+  #       with:
+  #         host: ${{ secrets.EC2_HOST }}
+  #         username: ${{ secrets.EC2_USER }}
+  #         key: ${{ secrets.EC2_SSH_KEY }}
+  #         source: "dist"
+  #         target: "/home/${{ secrets.EC2_USER }}/ts-node-server"
 
-      - name: SSH Run Remote Script
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ts-node-server
-            yarn install --production
-            pm2 restart all || pm2 start dist/server.js --name ts-node-server
+  #     - name: SSH Run Remote Script
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.EC2_HOST }}
+  #         username: ${{ secrets.EC2_USER }}
+  #         key: ${{ secrets.EC2_SSH_KEY }}
+  #         script: |
+  #           cd ts-node-server
+  #           yarn install --production
+  #           pm2 restart all || pm2 start dist/server.js --name ts-node-server

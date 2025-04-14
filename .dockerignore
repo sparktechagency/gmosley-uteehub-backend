@@ -1,9 +1,21 @@
 node_modules
 dist
+.vscode
+.vercel
 uploads
 .git
 .gitignore
 .env  # We ignore this so it is not inside the container
+Dockerfile
 logs/
 *.log
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+*.pem
 
