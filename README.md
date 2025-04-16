@@ -1,6 +1,5 @@
 # 🚀 Secure Node, Express Starter with Mongoose
 
-[![License](https://img.shields.io/github/license/fahadhossain24/ts-node-server1.0.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-18.x-brightgreen.svg)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Enabled-blue.svg)](https://www.typescriptlang.org/)
 [![Build](https://img.shields.io/github/actions/workflow/status/fahadhossain24/ts-node-server1.0/ci.yml?label=build)](https://github.com/fahadhossain24/ts-node-server1.0/actions)
