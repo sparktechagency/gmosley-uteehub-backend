@@ -23,7 +23,7 @@ A secure and scalable Express.js boilerplate built with TypeScript. It features 
 
 ```bash
 git clone https://github.com/fahadhossain24/ts-node-server1.0.git
-cd your-repo-name
+cd ts-node-server1.0
 
 ```
 
