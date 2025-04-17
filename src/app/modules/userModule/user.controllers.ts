@@ -57,22 +57,6 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     sendMail(mailOptions);
   }
 
-  // create referral code of owner user
-  const generateReferralCode = IdGenerator.generateReferralCode();
-  await referralCodeServices.createReferralCode({
-    user: user._id,
-    code: generateReferralCode,
-  });
-
-  // add point if referral code provide
-  if (userData.referralCode) {
-    const getReferralcode = await referralCodeServices.getReferralCodeByReferralCode(userData.referralCode);
-    if (getReferralcode) {
-      const user = await userServices.getSpecificUser(getReferralcode._id as unknown as string);
-      user.point = +Number(config.referral_point);
-    }
-  }
-
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     status: 'success',

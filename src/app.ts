@@ -2,18 +2,21 @@ import express, { Application, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import cors from 'cors';
 import config from './config';
-import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
 import path from 'path';
-import rateLimit from 'express-rate-limit';
 import notFound from './app/middlewares/notFound';
 import routers from './app/routers';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import { errorHandler, successHandler } from './config/morgan';
-import logger from './config/logger';
 import CustomError from './app/errors';
 import rootDesign from './app/middlewares/rootDesign';
+import { applyRateLimit } from './config/rateLimit.config';
+import { helmetConfig } from './config/helmet.config';
+import { compressionOptions } from './config/compression.config';
+import compression from 'compression';
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from './docs/swagger';
 
 const app: Application = express();
 
@@ -28,22 +31,20 @@ if (config.node_env !== 'test') {
 }
 
 app.use(cookieParser());
+app.use(compression(compressionOptions))
+app.use(helmetConfig)
 app.use(fileUpload());
 app.use('/v1/uploads', express.static(path.join('uploads')));
-const limiter = rateLimit({
-  max: 150,
-  windowMs: 15 * 60 * 1000,
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  message: 'Too many request found from your IP. Please try again after 15 minutes.',
-});
-// app.use(limiter);
+app.use(applyRateLimit());
 
 // application middleware
 app.use('/', routers);
 
 // send html design with a button 'click to see server health' and integrate an api to check server health
 app.get('/', rootDesign);
+
+// swagger route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.get('/health_check', (req: Request, res: Response) => {
   res.status(StatusCodes.OK).json({

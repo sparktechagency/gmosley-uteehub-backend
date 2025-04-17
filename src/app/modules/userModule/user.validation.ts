@@ -1,11 +1,5 @@
 import z from 'zod';
 
-// Shared validation for gender and role enums
-const genderEnum = z.enum(['male', 'female', 'other'], {
-  required_error: 'Gender is required!',
-  invalid_type_error: 'Invalid gender type. Allowed values are male, female, or other.',
-});
-
 const statusEnum = z.enum(['active', 'blocked', 'disabled'], {
   required_error: 'Status is required!',
   invalid_type_error: 'Invalid status type. Allowed values are active, blocked, or disabled.',
@@ -59,12 +53,6 @@ const createUserZodSchema = z.object({
     isSocial: z.boolean().optional().default(false),
 
     fcmToken: z.string().nullable().optional(),
-
-    survey: z.string().optional(), // Assuming ObjectId will be passed as a string
-
-    gender: genderEnum,
-
-    point: z.number().optional().default(0),
   }),
 });
 

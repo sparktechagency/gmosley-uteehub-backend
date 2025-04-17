@@ -6,7 +6,12 @@ import authentication from '../../middlewares/authorization';
 
 const userRouter = express.Router();
 
-userRouter.post('/create', requestValidator(UserValidationZodSchema.createUserZodSchema), userControllers.createUser);
+
+userRouter.post(
+  '/create',
+  requestValidator(UserValidationZodSchema.createUserZodSchema),
+  userControllers.createUser
+);
 userRouter.get('/retrive/all', userControllers.getAllUser);
 
 userRouter.get('/retrive/:id', requestValidator(UserValidationZodSchema.getSpecificUserZodSchema), userControllers.getSpecificUser);

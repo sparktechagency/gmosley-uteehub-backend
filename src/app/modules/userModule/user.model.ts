@@ -3,13 +3,7 @@ import IUser from './user.interface';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 
-enum Gender {
-  Male = 'male',
-  Female = 'female',
-  Other = 'other',
-}
-
-const userSchema = new mongoose.Schema<IUser>(
+export const userSchema = new mongoose.Schema<IUser>(
   {
     firstName: String,
     lastName: String,
@@ -69,23 +63,6 @@ const userSchema = new mongoose.Schema<IUser>(
     fcmToken: {
       type: String,
       default: null,
-    },
-    survey: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'survey',
-    },
-    gender: {
-      type: String,
-      enum: Object.values(Gender),
-      default: Gender.Male,
-    },
-    // referralCode: {
-    //   type: String,
-    //   default: null,
-    // },
-    point: {
-      type: Number,
-      default: 0,
     },
   },
   {
