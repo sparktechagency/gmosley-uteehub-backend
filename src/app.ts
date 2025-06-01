@@ -15,7 +15,7 @@ import { applyRateLimit } from './config/rateLimit.config';
 import { helmetConfig } from './config/helmet.config';
 import { compressionOptions } from './config/compression.config';
 import compression from 'compression';
-import swaggerUi from 'swagger-ui-express'
+import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './docs/swagger';
 
 const app: Application = express();
@@ -31,8 +31,8 @@ if (config.node_env !== 'test') {
 }
 
 app.use(cookieParser());
-app.use(compression(compressionOptions))
-app.use(helmetConfig)
+app.use(compression(compressionOptions));
+app.use(helmetConfig);
 app.use(fileUpload());
 app.use('/v1/uploads', express.static(path.join('uploads')));
 app.use(applyRateLimit());
@@ -44,7 +44,7 @@ app.use('/', routers);
 app.get('/', rootDesign);
 
 // swagger route
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/health_check', (req: Request, res: Response) => {
   res.status(StatusCodes.OK).json({

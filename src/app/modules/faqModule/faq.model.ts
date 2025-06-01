@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { IFaq } from './faq.interface';
 
-const faqSchema = new mongoose.Schema<IFaq>(
+export const faqSchema = new mongoose.Schema<IFaq>(
   {
     question: String,
     answer: String,

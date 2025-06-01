@@ -1,14 +1,7 @@
 import { Document, Types } from 'mongoose';
 
-enum Gender {
-  Male = 'male',
-  Female = 'female',
-  Other = 'other',
-}
-
 interface IUser extends Document {
-  firstName: string;
-  lastName: string;
+  _id: Types.ObjectId;
   email: string;
   phone: string;
   password: string;
@@ -18,13 +11,13 @@ interface IUser extends Document {
     code: string;
     expireDate: Date;
   };
-  role: string;
+  isDeleted: boolean;
   isSocial?: boolean;
   fcmToken?: string;
-  survey: Types.ObjectId;
-  gender: Gender;
-  referralCode?: string;
-  point?: number;
+  profile: {
+    role: string;
+    id: Types.ObjectId
+  }
 
   // method declarations
   comparePassword(userPlanePassword: string): boolean

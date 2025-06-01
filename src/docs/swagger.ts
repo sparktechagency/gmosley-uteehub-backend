@@ -7,9 +7,9 @@ const options: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: `${config.server_name} API`,
+      title: `${config.server_name} APIs`,
       version: '1.0.0',
-      description: `API documentation for your ${config.server_name}`,
+      description: `API documentation for your ${config.server_name}. Client: Gmosley`,
       contact: {
         name: 'Fahad Hossain',
         email: 'fahadhossain0503@gmail.com',
@@ -22,8 +22,8 @@ const options: swaggerJSDoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:5050/v1',
-        description: 'Development server',
+        url: 'http://localhost:5007/v1',
+        description: 'Dev server',
       },
     ],
     components: {

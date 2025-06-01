@@ -10,6 +10,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['production', 'development', 'test']).default('development'),
   PORT: z.preprocess((val) => Number(val), z.number().default(5003)),
   SERVER_NAME: z.string().min(1, 'Server name is required'),
+  SERVER_URL: z.string().min(1, 'Server URL is required'),
   MONGODB_URL: z.string().min(1, 'MongoDB connection URL is required'),
 
   JWT_ACCESS_TOKEN_SECRET: z.string().min(1, 'Access token secret key is required'),
@@ -19,8 +20,6 @@ const envSchema = z.object({
 
   GMAIL_APP_USER: z.string().email('Invalid email format'),
   GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),
-
-  FRONTEND_URL: z.string().min(1, 'Frontend url is required')
 });
 
 const envVars = envSchema.parse(process.env);
@@ -29,6 +28,7 @@ export default {
   node_env: envVars.NODE_ENV,
   server_port: envVars.PORT,
   server_name: envVars.SERVER_NAME,
+  server_url: envVars.SERVER_URL,
   mongodb_url: envVars.MONGODB_URL,
 
   jwt_access_token_secret: envVars.JWT_ACCESS_TOKEN_SECRET,
@@ -38,6 +38,4 @@ export default {
 
   gmail_app_user: envVars.GMAIL_APP_USER,
   gmail_app_password: envVars.GMAIL_APP_PASSWORD,
-
-  frontend_url: envVars.FRONTEND_URL
 };

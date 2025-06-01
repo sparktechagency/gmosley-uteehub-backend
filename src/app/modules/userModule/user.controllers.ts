@@ -8,7 +8,6 @@ import { Request, Response } from 'express';
 import jwtHelpers from '../../../healpers/healper.jwt';
 import config from '../../../config';
 import asyncHandler from '../../../shared/asyncHandler';
-import referralCodeServices from '../referralCodeModule/refarralCode.services';
 
 // controller for create new user
 const createUser = asyncHandler(async (req: Request, res: Response) => {

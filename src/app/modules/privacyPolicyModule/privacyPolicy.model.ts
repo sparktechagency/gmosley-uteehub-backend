@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { IPrivacyPolicy } from './privacyPolicy.interface';
 
-const privacyPolicySchema = new mongoose.Schema<IPrivacyPolicy>(
+export const privacyPolicySchema = new mongoose.Schema<IPrivacyPolicy>(
   {
     privacyPolicy: String,
   },
