@@ -5,8 +5,6 @@ import bcrypt from 'bcrypt';
 
 export const userSchema = new mongoose.Schema<IUser>(
   {
-    firstName: String,
-    lastName: String,
     email: {
       type: String,
       unique: true,
@@ -33,11 +31,6 @@ export const userSchema = new mongoose.Schema<IUser>(
       type: Boolean,
       default: false,
     },
-    role: {
-      type: String,
-      enum: ['user'],
-      default: 'user',
-    },
     status: {
       type: String,
       enum: {
@@ -63,6 +56,19 @@ export const userSchema = new mongoose.Schema<IUser>(
     fcmToken: {
       type: String,
       default: null,
+    },
+    profile: {
+      role: {
+        type: String,
+        enum: ['client', 'vendor'],
+        default: 'client',
+      },
+      id: {
+        type: Types.ObjectId,
+        refPath: 'profile.role',
+        required: true,
+        unique: true,
+      },
     },
   },
   {
@@ -96,7 +102,7 @@ userSchema.index({
   lastName: 'text',
   email: 'text',
   phone: 'text',
-})
+});
 
 const User = mongoose.model<IUser>('user', userSchema);
 export default User;

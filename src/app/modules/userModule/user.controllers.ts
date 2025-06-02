@@ -8,10 +8,19 @@ import { Request, Response } from 'express';
 import jwtHelpers from '../../../healpers/healper.jwt';
 import config from '../../../config';
 import asyncHandler from '../../../shared/asyncHandler';
+import fileUploader from '../../../utils/fileUploader';
+import mongoose, { ClientSession } from 'mongoose';
+import { ENUM_USER_ROLE } from '../../../enums/user';
+import clientServices from '../clientModule/client.services';
+import vendorServices from '../vendorModule/vendor.services';
+
 
 // controller for create new user
 const createUser = asyncHandler(async (req: Request, res: Response) => {
   const userData = req.body;
+  const files = req.files;
+  const session: ClientSession = await mongoose.startSession();
+  session.startTransaction();
 
   const expireDate = new Date();
   expireDate.setMinutes(expireDate.getMinutes() + 30);
@@ -34,9 +43,70 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     refreshToken = jwtHelpers.createToken(payload, config.jwt_refresh_token_secret as string, config.jwt_refresh_token_expiresin as string);
   }
 
-  const user = await userServices.createUser(userData);
-  if (!user) {
-    throw new CustomError.BadRequestError('Failed to create new user!');
+  if (files && files.document) {
+    const imagePath = await fileUploader(files, `${userData.role}-profile-${Date.now()}`, 'document');
+    userData.documents = imagePath;
+  }
+  if (files && files.image) {
+    const imagePath = await fileUploader(files, `${userData.role}-profile-${Date.now()}`, 'image');
+    userData.image = imagePath;
+  }
+
+  let user: any;
+  try {
+    user = await userServices.createUser(userData, session);
+    if (!user) {
+      throw new CustomError.BadRequestError('Failed to create new user!');
+    }
+
+    // Prepare profile payload
+    const profilePayload: any = {
+      userId: user._id,
+    };
+
+    const role = userData.role;
+
+    switch (role) {
+      case ENUM_USER_ROLE.CLIENT:
+        Object.assign(profilePayload, {
+          name: userData.name,
+          gender: userData.gender,
+          image: userData.image,
+        });
+        const clientProfile = await clientServices.createClientProfile(profilePayload, session);
+        if (clientProfile) {
+          user.profile.id = clientProfile._id;
+          user.profile.role = ENUM_USER_ROLE.CLIENT;
+        }
+        await user.save({ session });
+        break;
+      case ENUM_USER_ROLE.VENDOR:
+        Object.assign(profilePayload, {
+          name: userData.name,
+          address: userData.address,
+          services: userData.services,
+          deliveryOption: userData.deliveryOption,
+          documents: userData.documents,
+          radius: userData.radius,
+          rating: userData.rating,
+          image: userData.image,
+        });
+        const vendorProfile = await vendorServices.createVendorProfile(profilePayload, session);
+        if (vendorProfile) {
+          user.profile.id = vendorProfile._id;
+          user.profile.role = ENUM_USER_ROLE.VENDOR;
+        }
+        await user.save({ session });
+        break;
+      default:
+        throw new CustomError.BadRequestError('Invalid role!');
+    }
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
   }
 
   const { password, verification, ...userInfoAcceptPass } = user.toObject();
@@ -82,27 +152,16 @@ const getSpecificUser = asyncHandler(async (req: Request, res: Response) => {
 
 // service for get specific user by id
 const getAllUser = asyncHandler(async (req: Request, res: Response) => {
-  const { query } = req.query;
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 8;
-
-  const skip = (page - 1) * limit;
-  const users = await userServices.getAllUser(query as string);
-
-  const totalUsers = users?.length || 0;
-  const totalPages = Math.ceil(totalUsers / limit);
+  const query = req.query;
+  query.fields = '-password -verification -__v -isDeleted';
+  const result = await userServices.getAllUser(query as Record<string, unknown>);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     status: 'success',
     message: 'User retrive successfull',
-    meta: {
-      totalData: totalUsers,
-      totalPage: totalPages,
-      currentPage: page,
-      limit: limit,
-    },
-    data: users,
+    meta: result.meta,
+    data: result.data,
   });
 });
 
@@ -126,22 +185,87 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
 const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const userData = req.body;
+  const files = req.files;
 
+  // Prevent sensitive fields from being updated directly
   if (userData.password || userData.email || userData.isEmailVerified) {
-    throw new CustomError.BadRequestError("You can't update email, verified status and password directly!");
+    throw new CustomError.BadRequestError("You can't update email, verified status, or password directly!");
   }
 
-  const updatedUser = await userServices.updateSpecificUser(id, userData);
-  // console.log(updatedUser, updatedProfile)
-  if (!updatedUser?.isModified) {
-    throw new CustomError.BadRequestError('Failed to update user!');
+  const existingUser = await userServices.getSpecificUser(id);
+  if (!existingUser) {
+    throw new CustomError.NotFoundError('User not found!');
   }
 
-  sendResponse(res, {
-    statusCode: StatusCodes.OK,
-    status: 'success',
-    message: 'User modified successfull',
-  });
+  const session: ClientSession = await mongoose.startSession();
+  try {
+    session.startTransaction();
+
+    if (files && files.image) {
+      const imagePath = await fileUploader(files, `${existingUser.profile.role}-profile-${Date.now()}`, 'image');
+      userData.image = imagePath;
+    }
+
+    if (files && files.documents) {
+      const imagePath = await fileUploader(files, `${existingUser.profile.role}-profile-${Date.now()}`, 'documents');
+      userData.documents = imagePath;
+    }
+
+    let updatedUser;
+
+    // Role-based field whitelisting
+    switch (existingUser.profile.role) {
+      case ENUM_USER_ROLE.CLIENT: {
+        const clientUpdatePayload = {
+          name: userData.name,
+          gender: userData.gender,
+          image: userData.image,
+        };
+        updatedUser = await clientServices.updateSpecificClientProfile(
+          existingUser.profile.id as unknown as string,
+          clientUpdatePayload,
+          session,
+        );
+        await userServices.updateSpecificUser(id, userData, session);
+        break;
+      }
+
+      case ENUM_USER_ROLE.VENDOR: {
+        const vendorUpdatePayload = {
+          name: userData.name,
+          address: userData.address,
+          services: userData.services,
+          deliveryOption: userData.deliveryOption,
+          documents: userData.documents,
+          radius: userData.radius,
+          rating: userData.rating,
+          image: userData.image,
+        };
+        updatedUser = await vendorServices.updateSpecificVendor(existingUser.profile.id as unknown as string, vendorUpdatePayload, session);
+        await userServices.updateSpecificUser(id, userData, session);
+        break;
+      }
+
+      default:
+        updatedUser = await userServices.updateSpecificUser(id, userData, session);
+    }
+    if (!updatedUser?.isModified) {
+      throw new CustomError.BadRequestError('Failed to update user!');
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      status: 'success',
+      message: 'User updated successfully',
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 });
 
 export default {

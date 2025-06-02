@@ -5,10 +5,10 @@ type IApiResponse<T> = {
   status: string;
   message?: string | null;
   meta?: {
-    currentPage: number;
+    page: number;
     limit: number;
-    totalPage: number;
-    totalData: number;
+    total: number;
+    totalPages: number;
   };
   data?: T | null;
 };

@@ -1,36 +1,57 @@
-import { ObjectId, Types } from 'mongoose';
+import { ClientSession, ObjectId, Types } from 'mongoose';
 import IUser from './user.interface';
 import User from './user.model';
+import QueryBuilder from '../builder/builder.query';
 
 // service for create new user
-const createUser = async (data: IUser) => {
-  return await User.create(data);
+const createUser = async (data: IUser, session?: ClientSession) => {
+  return await User.create(data, session);
 };
 
 // service for get specific user
 const getSpecificUser = async (id: string): Promise<IUser> => {
   return await User.findOne({ _id: id })
     .populate({
-      path: 'survey',
+      path: 'profile',
       select: '',
     })
     .select('-password -verification');
 };
 
 // service for get specific user
-const getAllUser = async (query: string): Promise<IUser[]> => {
-  const matchCondition: any = {};
+const getAllUser = async (
+  query: Record<string, unknown>,
+): Promise<{
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  data: IUser[];
+}> => {
+  // let userQuery: any = {};
+  // if(query.role){
+  //   userQuery['profile.role'] = query.role;
+  // }
+  // console.log(userQuery)
+  const result = new QueryBuilder(
+    User.find({ isDeleted: false }).populate({ path: 'profile.id', select: '-userId -createdAt -updatedAt -__v -isDeleted' }),
+    query,
+  )
+    .filter()
+    .search(['email', 'phone'])
+    .sort()
+    .pagination()
+    .select();
 
-  if (query) {
-    matchCondition.$text = { $search: query }; // Add search criteria if provided
-  }
+  const totalCount = await result.countTotal();
+  const users = await result.modelQuery;
 
-  return await User.find(matchCondition)
-    .populate({
-      path: 'survey',
-      select: '',
-    })
-    .select('-password -verification');
+  return {
+    meta: totalCount,
+    data: users,
+  };
 };
 
 // service for get specific user
@@ -44,8 +65,8 @@ const getSpecificUserByEmail = async (email: string): Promise<IUser> => {
 };
 
 // service for update specific user
-const updateSpecificUser = async (id: string, data: Partial<IUser>) => {
-  return await User.findOneAndUpdate({ _id: id }, data);
+const updateSpecificUser = async (id: string, data: Partial<IUser>, session?: ClientSession) => {
+  return await User.findOneAndUpdate({ _id: id }, data, { session });
 };
 
 // service for delete specific user

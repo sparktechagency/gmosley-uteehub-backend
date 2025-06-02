@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { IClient } from "./client.interface";
+import { Gender, IClient } from "./client.interface";
 
 export const clientSchema = new mongoose.Schema<IClient>(
     {
@@ -15,7 +15,7 @@ export const clientSchema = new mongoose.Schema<IClient>(
         },
         gender: {
             type: String,
-            enum: ['male', 'female', 'other'],
+            enum: Gender,
             required: true,
         },
         image: {
