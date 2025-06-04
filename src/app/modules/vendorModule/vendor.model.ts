@@ -6,43 +6,36 @@ export const vendorSchema = new mongoose.Schema<IVendor>(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
-      required: true,
       unique: true,
     },
     name: {
       type: String,
-      required: true,
     },
     address: {
       type: String,
-      required: true,
     },
-    services: {
-      type: [String],
-      required: true,
+    description: {
+      type: String,
     },
     deliveryOption: [
       {
         type: String,
-        enum: ['pickup', 'courier'],
-        required: true,
+        enum: ['pickup', 'courier', 'pickupAndCourier'],
       },
     ],
     documents: {
       type: [String],
-      required: true,
     },
-    radius: {
-      type: Number,
-      required: true,
-    },
-    rating: {
-      type: Number,
-      default: 0,
+    cords: {
+      lat: {
+        type: Number,
+      },
+      lng: {
+        type: Number,
+      },
     },
     image: {
       type: String,
-      required: true,
     },
   },
   {

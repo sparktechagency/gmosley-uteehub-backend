@@ -1,18 +1,20 @@
-import { ClientSession, ObjectId, Types } from 'mongoose';
+import mongoose, { ClientSession, ObjectId, Types } from 'mongoose';
 import IUser from './user.interface';
 import User from './user.model';
 import QueryBuilder from '../builder/builder.query';
 
 // service for create new user
 const createUser = async (data: IUser, session?: ClientSession) => {
-  return await User.create(data, session);
+  const user = new User(data);
+  return await user.save({ session });
 };
 
 // service for get specific user
 const getSpecificUser = async (id: string): Promise<IUser> => {
+  console.log(id)
   return await User.findOne({ _id: id })
     .populate({
-      path: 'profile',
+      path: 'profile.id',
       select: '',
     })
     .select('-password -verification');
@@ -36,7 +38,7 @@ const getAllUser = async (
   // }
   // console.log(userQuery)
   const result = new QueryBuilder(
-    User.find({ isDeleted: false }).populate({ path: 'profile.id', select: '-userId -createdAt -updatedAt -__v -isDeleted' }),
+    User.find({}).populate({ path: 'profile.id', select: '-userId -createdAt -updatedAt -__v' }),
     query,
   )
     .filter()
@@ -66,6 +68,7 @@ const getSpecificUserByEmail = async (email: string): Promise<IUser> => {
 
 // service for update specific user
 const updateSpecificUser = async (id: string, data: Partial<IUser>, session?: ClientSession) => {
+  console.log(data)
   return await User.findOneAndUpdate({ _id: id }, data, { session });
 };
 

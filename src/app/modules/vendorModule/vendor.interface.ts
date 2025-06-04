@@ -5,10 +5,13 @@ export interface IVendor extends Document {
     userId: Types.ObjectId;
     name: string;
     address: string;
-    services: string[];
+    description: string;
     deliveryOption: string[];
     documents: string[];
-    radius: number;
+    cords: {
+        lat: number;
+        lng: number;
+    };
     rating: number;
     image: string;
     createdAt: Date;

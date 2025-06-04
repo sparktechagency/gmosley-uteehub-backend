@@ -5,20 +5,13 @@ const statusEnum = z.enum(['active', 'blocked', 'disabled'], {
   invalid_type_error: 'Invalid status type. Allowed values are active, blocked, or disabled.',
 });
 
-// Validation schema for user creation
 const createUserZodSchema = z.object({
   body: z.object({
-    firstName: z
+    name: z
       .string({
-        required_error: 'First name is required!',
+        required_error: 'Name is required!',
       })
-      .min(1, 'First name must not be empty!'),
-
-    lastName: z
-      .string({
-        required_error: 'Last name is required!',
-      })
-      .min(1, 'Last name must not be empty!'),
+      .min(1, 'Name must not be empty!'),
 
     email: z
       .string({
@@ -39,24 +32,30 @@ const createUserZodSchema = z.object({
       })
       .min(8, 'Password must be at least 8 characters!'),
 
-    isEmailVerified: z.boolean().optional().default(false),
+    isEmailVerified: z
+      .preprocess((val) => val === 'true' || val === true, z.boolean())
+      .optional()
+      .default(false),
 
-    status: statusEnum.optional().default('active'),
+    status: z
+      .preprocess((val) => val?.toString(), statusEnum)
+      .optional()
+      .default('active'),
 
     verification: z
       .object({
         code: z.string().nullable().optional(),
-        expireDate: z.date().nullable().optional(),
+        expireDate: z
+          .preprocess((val) => (val ? new Date(val as string) : null), z.date().nullable())
+          .optional(),
       })
       .optional(),
-
-    isSocial: z.boolean().optional().default(false),
 
     fcmToken: z.string().nullable().optional(),
   }),
 });
 
-// Validation schema for fetching a specific user by ID
+
 const getSpecificUserZodSchema = z.object({
   params: z.object({
     id: z.string({

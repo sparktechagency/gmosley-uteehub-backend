@@ -9,18 +9,20 @@ import jwtHelpers from '../../../healpers/healper.jwt';
 import config from '../../../config';
 import asyncHandler from '../../../shared/asyncHandler';
 import fileUploader from '../../../utils/fileUploader';
-import mongoose, { ClientSession } from 'mongoose';
+import mongoose, { ClientSession, Types } from 'mongoose';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import clientServices from '../clientModule/client.services';
 import vendorServices from '../vendorModule/vendor.services';
-
 
 // controller for create new user
 const createUser = asyncHandler(async (req: Request, res: Response) => {
   const userData = req.body;
   const files = req.files;
+
   const session: ClientSession = await mongoose.startSession();
   session.startTransaction();
+
+  userData.isSocial = userData.isSocial === 'true';
 
   const expireDate = new Date();
   expireDate.setMinutes(expireDate.getMinutes() + 30);
@@ -29,6 +31,13 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     code: IdGenerator.generateNumberId(),
     expireDate,
   };
+
+  if(userData.lat && userData.lng){
+    userData.cords = {
+      lat: Number(userData.lat),
+      lng: Number(userData.lng),
+    };
+  }
 
   // token for social user
   let accessToken, refreshToken;
@@ -43,8 +52,8 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     refreshToken = jwtHelpers.createToken(payload, config.jwt_refresh_token_secret as string, config.jwt_refresh_token_expiresin as string);
   }
 
-  if (files && files.document) {
-    const imagePath = await fileUploader(files, `${userData.role}-profile-${Date.now()}`, 'document');
+  if (files && files.documents) {
+    const imagePath = await fileUploader(files, `${userData.role}-profile-${Date.now()}`, 'documents');
     userData.documents = imagePath;
   }
   if (files && files.image) {
@@ -75,9 +84,10 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
         });
         const clientProfile = await clientServices.createClientProfile(profilePayload, session);
         if (clientProfile) {
-          user.profile.id = clientProfile._id;
+          user.profile.id = clientProfile._id as unknown as Types.ObjectId;
           user.profile.role = ENUM_USER_ROLE.CLIENT;
         }
+        // console.log(user)
         await user.save({ session });
         break;
       case ENUM_USER_ROLE.VENDOR:
@@ -85,9 +95,10 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
           name: userData.name,
           address: userData.address,
           services: userData.services,
+          description: userData.description,
           deliveryOption: userData.deliveryOption,
           documents: userData.documents,
-          radius: userData.radius,
+          cords: userData.cords,
           rating: userData.rating,
           image: userData.image,
         });
@@ -201,6 +212,13 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
   try {
     session.startTransaction();
 
+    if(userData.lat && userData.lng){
+      userData.cords = {
+        lat: Number(userData.lat),
+        lng: Number(userData.lng),
+      };
+    }
+
     if (files && files.image) {
       const imagePath = await fileUploader(files, `${existingUser.profile.role}-profile-${Date.now()}`, 'image');
       userData.image = imagePath;
@@ -235,6 +253,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
           name: userData.name,
           address: userData.address,
           services: userData.services,
+          description: userData.description,
           deliveryOption: userData.deliveryOption,
           documents: userData.documents,
           radius: userData.radius,

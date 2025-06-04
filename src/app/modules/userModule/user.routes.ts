@@ -12,9 +12,9 @@ userRouter.post(
   requestValidator(UserValidationZodSchema.createUserZodSchema),
   userControllers.createUser
 );
-userRouter.get('/retrive/all', userControllers.getAllUser);
+userRouter.get('/retrieve/all', userControllers.getAllUser);
 
-userRouter.get('/retrive/:id', requestValidator(UserValidationZodSchema.getSpecificUserZodSchema), userControllers.getSpecificUser);
+userRouter.get('/retrieve/:id', requestValidator(UserValidationZodSchema.getSpecificUserZodSchema), userControllers.getSpecificUser);
 
 userRouter.patch(
   '/update/:id',

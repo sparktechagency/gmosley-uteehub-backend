@@ -6,21 +6,17 @@ export const clientSchema = new mongoose.Schema<IClient>(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'user',
-            required: true,
             unique: true,
         },
         name: {
             type: String,
-            required: true,
         },
         gender: {
             type: String,
             enum: Gender,
-            required: true,
         },
         image: {
-            type: String,
-            required: true,
+            type: String
         },
     },
     {

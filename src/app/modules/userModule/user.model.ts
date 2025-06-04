@@ -66,7 +66,6 @@ export const userSchema = new mongoose.Schema<IUser>(
       id: {
         type: Types.ObjectId,
         refPath: 'profile.role',
-        required: true,
         unique: true,
       },
     },
@@ -97,12 +96,12 @@ userSchema.methods.compareVerificationCode = function (userPlaneCode: string) {
   return bcrypt.compareSync(userPlaneCode, this.verification.code);
 };
 
-userSchema.index({
-  firstName: 'text',
-  lastName: 'text',
-  email: 'text',
-  phone: 'text',
-});
+// userSchema.index({
+  // firstName: 'text',
+  // lastName: 'text',
+//   email: 'text',
+//   phone: 'text',
+// });
 
 const User = mongoose.model<IUser>('user', userSchema);
 export default User;
