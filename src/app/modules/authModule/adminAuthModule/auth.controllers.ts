@@ -18,6 +18,14 @@ const adminLogin = asyncHandler(async (req: Request, res: Response) => {
 
   if (!admin) throw new CustomError.NotFoundError('Invalid email or password!');
 
+  // check user disablility
+  if (admin.status === 'disabled') {
+    throw new CustomError.BadRequestError('Your current account is disabled!');
+  }
+  if (admin.status === 'blocked') {
+    throw new CustomError.BadRequestError('Currently your account is blocked by super-admin!');
+  }
+
   // check the password is correct
   const isPasswordMatch = admin.comparePassword(password);
 

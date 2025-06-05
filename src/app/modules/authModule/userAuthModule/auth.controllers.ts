@@ -15,7 +15,7 @@ import asyncHandler from '../../../../shared/asyncHandler';
 const userLogin = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, isSocial, fcmToken } = req.body;
 
-  const user = await authServices.getUserByEmail(email);
+  const user: any = await authServices.getUserByEmail(email);
 
   if (!user) throw new CustomError.BadRequestError('Invalid email or password!');
 
@@ -35,8 +35,9 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
 
   // generate token
   const payload = {
+    id: user._id,
     email: user.email,
-    role: user.role,
+    role: user.profile.role,
   };
 
   const accessToken = jwtHelpers.createToken(
@@ -52,11 +53,10 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   );
 
   const userInfo = {
-    firstName: user.firstName,
-    lastName: user.lastName,
+    name: user.profile.id.name,
     email: user.email,
     _id: user._id,
-    role: user.role,
+    role: user.profile.role,
     accessToken,
     refreshToken,
     isEmailVerified: isSocial ? true : user.isEmailVerified,
@@ -292,8 +292,9 @@ const getAccessTokenByRefreshToken = asyncHandler(async (req: Request, res: Resp
   }
 
   const payload = {
+    id: user._id,
     email: user.email,
-    roles: user.role,
+    roles: user.profile.role,
   };
 
   const newAccessToken = jwtHelpers.createToken(

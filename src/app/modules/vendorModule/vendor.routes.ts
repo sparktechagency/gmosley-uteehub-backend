@@ -17,5 +17,4 @@ vendorRouter.get(
   vendorController.getSpecificVendorDetails,
 );
 
-
 export default vendorRouter;

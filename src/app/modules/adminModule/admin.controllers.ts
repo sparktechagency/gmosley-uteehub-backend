@@ -28,13 +28,14 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
 // controller for get all admin
 const getAllAdmin = asyncHandler(async (req: Request, res: Response) => {
   const admins = await adminServices.getAllAdmin();
+  // console.log(admins)
   const adminsAcceptSuperAdmin = admins.filter((admin) => admin.role !== 'super-admin');
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     status: 'success',
     message: 'Admin retrive successfull',
-    data: adminsAcceptSuperAdmin,
+    data: admins,
   });
 });
 

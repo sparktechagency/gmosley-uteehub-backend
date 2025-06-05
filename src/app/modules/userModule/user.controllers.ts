@@ -32,7 +32,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     expireDate,
   };
 
-  if(userData.lat && userData.lng){
+  if (userData.lat && userData.lng) {
     userData.cords = {
       lat: Number(userData.lat),
       lng: Number(userData.lng),
@@ -130,7 +130,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     const mailOptions = {
       from: config.gmail_app_user as string,
       to: userData.email,
-      subject: 'Illuminate Muslim Minds - Email Verification',
+      subject: 'U-Tee-Hub - Email Verification',
       text: content,
     };
 
@@ -212,7 +212,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
   try {
     session.startTransaction();
 
-    if(userData.lat && userData.lng){
+    if (userData.lat && userData.lng) {
       userData.cords = {
         lat: Number(userData.lat),
         lng: Number(userData.lng),
