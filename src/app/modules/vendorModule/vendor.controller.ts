@@ -27,7 +27,26 @@ const getSpecificVendorDetails = asyncHandler(async (req: Request, res: Response
   });
 });
 
+// retrieve all nearest vendors based on client location plus delivery location
+const getNearestVendors = asyncHandler(async (req: Request, res: Response) => {
+  const { clientLocation } = req.body;
+  if(!clientLocation){
+    throw new Error('clientLocation is required');
+  }
+  const result = await vendorServices.retrieveNearestVendor(clientLocation as string);
+  if(!result){
+    throw new Error('No nearest vendor found');
+  }
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'data retrievced successfully',
+    data: result,
+  });
+});
+
 export default {
   getAllVendorProfile,
   getSpecificVendorDetails,
+  getNearestVendors,
 };

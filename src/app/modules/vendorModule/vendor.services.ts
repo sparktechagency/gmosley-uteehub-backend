@@ -26,10 +26,28 @@ const deleteSpecificVendor = async (id: string, session?: ClientSession) => {
   return await Vendor.deleteOne({ _id: id }, { session });
 };
 
+// service for retrieve nearest vendor
+const retrieveNearestVendor = async (clientLocation: string) => {
+  const [lat, lon] = clientLocation.split(',').map(Number);
+  return await Vendor.find({
+    location: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [lon, lat], // MongoDB expects [lng, lat]
+        },
+        $maxDistance: 1000, // in meters
+      },
+    },
+  });
+};
+
+
 export default {
   createVendorProfile,
   updateSpecificVendor,
   deleteSpecificVendor,
   retrieveSpecificVendor,
   retrieveAllVendor,
+  retrieveNearestVendor,
 };

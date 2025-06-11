@@ -17,4 +17,10 @@ vendorRouter.get(
   vendorController.getSpecificVendorDetails,
 );
 
+vendorRouter.get(
+  '/nearest-all',
+  // authentication(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  vendorController.getNearestVendors,
+);
+
 export default vendorRouter;

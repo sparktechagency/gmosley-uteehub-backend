@@ -8,9 +8,9 @@ export interface IVendor extends Document {
     description: string;
     deliveryOption: string[];
     documents: string[];
-    cords: {
-        lat: number;
-        lng: number;
+    location: {
+        type: string;
+        coordinates: number[];
     };
     rating: number;
     image: string;
