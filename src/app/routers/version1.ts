@@ -9,6 +9,7 @@ import termsConditionRouter from '../modules/termsConditionModule/termsCondition
 import faqRouter from '../modules/faqModule/faq.routes';
 import clientRouter from '../modules/clientModule/client.Route';
 import vendorRouter from '../modules/vendorModule/vendor.routes';
+import orderRouter from '../modules/orderModule/order.routes';
 
 const routersVersionOne = express.Router();
 
@@ -23,6 +24,7 @@ routersVersionOne.use('/admin/auth', adminAuthRouter);
 // app
 routersVersionOne.use('/client', clientRouter);
 routersVersionOne.use('/vendor', vendorRouter);
+routersVersionOne.use('/order', orderRouter);
 
 // settings
 routersVersionOne.use('/about-us', aboutUsRouter);

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { FileArray, UploadedFile } from 'express-fileupload';
 import CustomError from '../app/errors';
+import config from '../config';
 
 interface FileUploader {
   (files: FileArray, directory: string, imageName: string): Promise<string | string[]>;
@@ -27,7 +28,7 @@ const fileUploader: FileUploader = async (files, directory, imageName) => {
     const filePath = path.join(folderPath, fileName);
     await file.mv(filePath);
 
-    return filePath;
+    return `${config.server_url}/v1/${filePath}`;
   } else if (files[imageName].length > 0) {
     // Handle multiple file uploads
     const filePaths: string[] = [];
@@ -35,7 +36,7 @@ const fileUploader: FileUploader = async (files, directory, imageName) => {
       const fileName = item.name;
       const filePath = path.join(folderPath, fileName);
       await item.mv(filePath);
-      filePaths.push(filePath); // Collect all file paths
+      filePaths.push(`${config.server_url}/v1/${filePath}`); // Collect all file paths
     }
 
     return filePaths;

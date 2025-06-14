@@ -33,9 +33,9 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
   };
 
   if (userData.lat && userData.lng) {
-    userData.cords = {
-      lat: Number(userData.lat),
-      lng: Number(userData.lng),
+    userData.location = {
+      type: 'Point',
+      coordinates: [Number(userData.lng), Number(userData.lat)],
     };
   }
 
@@ -98,7 +98,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
           description: userData.description,
           deliveryOption: userData.deliveryOption,
           documents: userData.documents,
-          cords: userData.cords,
+          location: userData.location,
           rating: userData.rating,
           image: userData.image,
         });
@@ -213,9 +213,9 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
     session.startTransaction();
 
     if (userData.lat && userData.lng) {
-      userData.cords = {
-        lat: Number(userData.lat),
-        lng: Number(userData.lng),
+      userData.location = {
+        type: 'Point',
+        coordinates: [Number(userData.lng), Number(userData.lat)],
       };
     }
 

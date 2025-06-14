@@ -39,7 +39,7 @@ const retrieveNearestVendor = async (clientLocation: string) => {
         $maxDistance: 1000, // in meters
       },
     },
-  });
+  }).populate('userId', 'name email phone');
 };
 
 

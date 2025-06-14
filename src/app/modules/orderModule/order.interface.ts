@@ -2,9 +2,10 @@ import { Document, Types } from "mongoose";
 
 export interface IOrder extends Document {
     _id: Types.ObjectId;
+    orderId: string;
     vendor: Types.ObjectId;
     client: Types.ObjectId;
-    deliverDate: Date;
+    deliveryDate: Date;
     extentionHistory: {
         lastDate: Date;
         newDate: Date;

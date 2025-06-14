@@ -1,8 +1,8 @@
 // import mongoose from 'mongoose';
 // import { IVendor } from './vendor.interface';
 
-import mongoose from "mongoose";
-import { IVendor } from "./vendor.interface";
+import mongoose from 'mongoose';
+import { IVendor } from './vendor.interface';
 
 // export const vendorSchema = new mongoose.Schema<IVendor>(
 //   {
@@ -48,7 +48,6 @@ import { IVendor } from "./vendor.interface";
 
 // const Vendor = mongoose.model<IVendor>('vendor', vendorSchema);
 // export default Vendor;
-
 
 export const vendorSchema = new mongoose.Schema<IVendor>(
   {
@@ -105,4 +104,3 @@ vendorSchema.index({ location: '2dsphere' });
 
 const Vendor = mongoose.model<IVendor>('vendor', vendorSchema);
 export default Vendor;
-

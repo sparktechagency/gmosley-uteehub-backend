@@ -20,6 +20,11 @@ const IdGenerator = {
   generateId: () => {
     return uuidv4();
   },
+
+  generateSerialId: (prefix: string, lastIdNumber: number, length: number = 5): string => {
+    const newNumber = (lastIdNumber + 1).toString().padStart(length, '0');
+    return `${prefix}-${newNumber}`;
+  },
 };
 
 export default IdGenerator;
