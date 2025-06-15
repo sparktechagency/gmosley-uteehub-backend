@@ -1,32 +1,30 @@
-# Use an official Node.js runtime as the base image
+# Builder
 FROM node:18-alpine AS builder
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
 COPY package.json yarn.lock ./
 
-# Clean npm cache and install production dependencies
-RUN npm cache clean --force
-RUN yarn install --production --frozen-lockfile
+# Install ALL dependencies for building (dev + prod)
+RUN yarn install --frozen-lockfile
 
-# Copy only necessary source files for building
 COPY . .
 
-# Compile TypeScript (build only necessary files)
+# Build TypeScript output
 RUN yarn build
 
-# Second stage: smaller runtime image
+# Production image
 FROM node:18-alpine
 
-# Set the working directory
 WORKDIR /app
 
-# Copy the build output from the builder stage
-COPY --from=builder /app/dist /app/dist
-COPY --from=builder /app/node_modules /app/node_modules
+# Install only production dependencies
+COPY package.json yarn.lock ./
+RUN yarn install --production --frozen-lockfile
 
-EXPOSE 5000
+# Copy built output
+COPY --from=builder /app/dist /app/dist
+
+EXPOSE 5007
 
 CMD ["node", "dist/server.js"]

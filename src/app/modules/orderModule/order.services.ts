@@ -32,6 +32,10 @@ class OrderService {
   getLastOrder = async () => {
     return await Order.findOne().sort({ createdAt: -1 });
   };
+
+  // extendOrderDeadline = async (orderId: string, data: Partial<IOrder>) => {
+  //   return await Order.findByIdAndUpdate(orderId, data);
+  // };
 }
 
 export default new OrderService();

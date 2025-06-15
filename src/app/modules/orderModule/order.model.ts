@@ -33,6 +33,7 @@ export const orderSchema = new mongoose.Schema<IOrder>(
         },
       ],
       default: [],
+      _id: false,
     },
     price: {
       type: Number,
@@ -77,8 +78,8 @@ export const orderSchema = new mongoose.Schema<IOrder>(
     ],
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'in-progress', 'shipped', 'delivered', 'revision', 'completed'],
-      default: 'pending',
+      enum: ['offered', 'rejected', 'accepted', 'shipped', 'delivered', 'revision', 'completed'],
+      default: 'offered',
     },
     deliveryOption: {
       type: String,
