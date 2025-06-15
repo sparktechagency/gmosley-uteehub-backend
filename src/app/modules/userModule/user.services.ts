@@ -20,6 +20,16 @@ const getSpecificUser = async (id: string): Promise<IUser> => {
     .select('-password -verification');
 };
 
+// service for get specific user with population
+const getSpecificUserWithPopulation = async (id: string): Promise<IUser> => {
+  return await User.findOne({ _id: id })
+    .populate({
+      path: 'profile.id',
+      select: '',
+    })
+    .select('-password -verification');
+};
+
 // service for get specific user
 const getAllUser = async (
   query: Record<string, unknown>,
@@ -89,4 +99,5 @@ export default {
   updateSpecificUser,
   // deleteSpecificUser,
   getAllUser,
+  getSpecificUserWithPopulation,
 };

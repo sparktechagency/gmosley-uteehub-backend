@@ -21,6 +21,8 @@ const authentication = (...requiredRoles: string[]) => {
       }
       req.user = userPayload;
 
+      console.log(userPayload, requiredRoles)
+
       // Guard for check authentication
       if (requiredRoles.length && !requiredRoles.includes(userPayload.role)) {
         throw new CustomError.ForbiddenError('Forbidden!');
