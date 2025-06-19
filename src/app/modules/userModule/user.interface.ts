@@ -18,6 +18,8 @@ interface IUser extends Document {
     role: string;
     id: Types.ObjectId
   }
+  isOnline: boolean;
+  lastSeen: Date;
 
   // method declarations
   comparePassword(userPlanePassword: string): boolean

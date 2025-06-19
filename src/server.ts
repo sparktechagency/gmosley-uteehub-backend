@@ -1,8 +1,13 @@
 import mongoose from 'mongoose';
 import config from './config';
 import app from './app';
+import http from 'http';
+import { initSocket } from './app/socket/config.socket';
 
-let server: any;
+// let server: any;
+const server = http.createServer(app)
+
+initSocket(server);
 
 // handle uncaught exception error
 process.on('uncaughtException', (error) => {
@@ -14,7 +19,7 @@ const startServer = async () => {
   await mongoose.connect(config.mongodb_url as string);
   console.log('\x1b[36mDatabase connection successfull\x1b[0m');
 
-  server = app.listen(config.server_port || 5007, () => {
+  server.listen(config.server_port || 5007, () => {
     console.log(`\x1b[32mServer is listening on port ${config.server_port || 5007}\x1b[0m`);
   });
 };

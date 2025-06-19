@@ -12,6 +12,7 @@ import vendorRouter from '../modules/vendorModule/vendor.routes';
 import orderRouter from '../modules/orderModule/order.routes';
 import supportRouter from '../modules/supportModule/support.routes';
 import conversationRouter from '../modules/conversationModule/conversations.routes';
+import messageRouter from '../modules/messageModule/message.routes';
 
 const routersVersionOne = express.Router();
 
@@ -29,6 +30,7 @@ routersVersionOne.use('/vendor', vendorRouter);
 routersVersionOne.use('/order', orderRouter);
 routersVersionOne.use('/support', supportRouter);
 routersVersionOne.use('/conversation', conversationRouter);
+routersVersionOne.use('/message', messageRouter);
 
 // settings
 routersVersionOne.use('/about-us', aboutUsRouter);

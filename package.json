@@ -16,6 +16,8 @@
     "generate:module": "ts-node src/scripts/generator/module"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.832.0",
+    "@aws-sdk/s3-presigned-post": "^3.832.0",
     "@types/cookie-parser": "^1.4.7",
     "bcrypt": "^5.1.1",
     "compression": "^1.8.0",
@@ -35,6 +37,7 @@
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.16",
     "pm2": "^5.4.3",
+    "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",

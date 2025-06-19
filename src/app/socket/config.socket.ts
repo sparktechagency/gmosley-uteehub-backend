@@ -1,19 +1,26 @@
-import { Server as SocketIOServer, Socket } from 'socket.io';
+// socket.ts
+import { Server as HTTPServer } from "http";
+import { Server as SocketIOServer, Socket } from "socket.io";
+import chatHandler from "./chat.socket";
 
-import SocketManager from './manager.socket';
-import { IConversation } from '../modules/conversationModule/conversation.interface';
+let io: SocketIOServer;
 
-interface ConnectedUsers {
-    [userId: string]: string; // Maps userId to socketId
-}
+const initSocket = (server: HTTPServer): SocketIOServer => {
+  io = new SocketIOServer(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+  });
 
-const connectedUsers: ConnectedUsers = {};
-const activeAppUsers: string[] = [];
-let joinUser: (conversation: Partial<IConversation>) => void;
+  console.log("Socket.io initialized");
 
-const configSocket = (io: SocketIOServer): void => {
-    const socketManager = SocketManager.getInstance();
-    socketManager.init(io);
+  io.on("connection", (socket: Socket) => {
+    console.log(`New connection: ${socket.id}`);
+    chatHandler(io, socket);
+  });
+
+  return io;
 };
 
-export default configSocket;
+export { initSocket };
