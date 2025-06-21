@@ -26,6 +26,9 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   if (user.status === 'blocked') {
     throw new CustomError.BadRequestError('Currently your account is blocked by admin!');
   }
+  if(user.status === 'pending'){
+    throw new CustomError.BadRequestError('Your account is not approved yet!');
+  }
 
   if (!isSocial) {
     // check the password is correct

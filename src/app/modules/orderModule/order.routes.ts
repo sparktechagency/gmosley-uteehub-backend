@@ -4,6 +4,7 @@ import orderController from './order.controllers';
 const orderRouter = express.Router();
 
 orderRouter.post('/create', orderController.createOrder);
+orderRouter.post('/initiate-payment', orderController.initiateOrderPayment);
 orderRouter.get('/retrieve/all', orderController.getAllOrder);
 orderRouter.get('/retrieve/specific/:id', orderController.getSpecificOrder);
 orderRouter.patch('/update/:id', orderController.updateSpecificOrder);

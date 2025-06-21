@@ -6,6 +6,10 @@ import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import fileUploader from '../../../utils/fileUploader';
 import CustomError from '../../errors';
+import Stripe from 'stripe';
+import config from '../../../config';
+
+const stripe = new Stripe(config.stripe_secret_key as string);
 
 // controller for create new order
 const createOrder = asyncHandler(async (req: Request, res: Response) => {
@@ -75,7 +79,7 @@ const extendOrderDeadline = asyncHandler(async (req: Request, res: Response) => 
   }
 
   // Optional: Prevent multiple pending requests
-  const hasPendingRequest = order.extentionHistory.some(ext => ext.status === 'pending');
+  const hasPendingRequest = order.extentionHistory.some((ext) => ext.status === 'pending');
   if (hasPendingRequest) {
     throw new CustomError.BadRequestError('There is already a pending deadline extension request.');
   }
@@ -107,7 +111,7 @@ const approveOrRejectDeadlineExtendRequest = asyncHandler(async (req: Request, r
     throw new CustomError.NotFoundError('No order found!');
   }
 
-  const pendingRequestIndex = order.extentionHistory.findIndex(ext => ext.status === 'pending');
+  const pendingRequestIndex = order.extentionHistory.findIndex((ext) => ext.status === 'pending');
 
   if (pendingRequestIndex === -1) {
     throw new CustomError.BadRequestError('No pending deadline extension request found.');
@@ -134,6 +138,26 @@ const approveOrRejectDeadlineExtendRequest = asyncHandler(async (req: Request, r
   });
 });
 
+const initiateOrderPayment = asyncHandler(async (req: Request, res: Response) => {
+  const { customerEmail, amount, currency, quantity } = req.body;
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    line_items: [{ price_data: { currency, product_data: { name: 'Order' }, unit_amount: amount * 100 }, quantity }],
+    mode: 'payment',
+    customer_email: customerEmail,
+    success_url: `${config.server_url}/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${config.server_url}/cancel`,
+  });
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'Order created successfully',
+    data: { url: session.url },
+  });
+});
+
 export default {
   createOrder,
   getAllOrder,
@@ -141,4 +165,5 @@ export default {
   updateSpecificOrder,
   extendOrderDeadline,
   approveOrRejectDeadlineExtendRequest,
+  initiateOrderPayment,
 };

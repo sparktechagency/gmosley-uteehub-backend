@@ -22,6 +22,8 @@ const envSchema = z.object({
   GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),
 
   FRONTEND_URL: z.string().min(1, 'Frontend URL is required'),
+
+  STRIPE_SECRET_KEY: z.string().min(1, 'Stripe secret key is required'),
 });
 
 const envVars = envSchema.parse(process.env);
@@ -42,4 +44,6 @@ export default {
   gmail_app_password: envVars.GMAIL_APP_PASSWORD,
 
   frontend_url: envVars.FRONTEND_URL,
+
+  stripe_secret_key: envVars.STRIPE_SECRET_KEY,
 };

@@ -38,6 +38,7 @@
     "nodemailer": "^6.9.16",
     "pm2": "^5.4.3",
     "socket.io": "^4.8.1",
+    "stripe": "^18.2.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",

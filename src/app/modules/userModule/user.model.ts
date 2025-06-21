@@ -34,8 +34,8 @@ export const userSchema = new mongoose.Schema<IUser>(
     status: {
       type: String,
       enum: {
-        values: ['active', 'blocked', 'disabled'],
-        message: '{VALUE} is not accepted as a status value. Use active/blocked/disabled.',
+        values: ['pending', 'active', 'blocked', 'disabled'],
+        message: '{VALUE} is not accepted as a status value. Use pending/active/blocked/disabled.',
       },
       default: 'active',
     },

@@ -39,9 +39,13 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     };
   }
 
+  if (userData.role === ENUM_USER_ROLE.VENDOR) {
+    userData.status = 'pending';
+  }
+
   // token for social user
   let accessToken, refreshToken;
-  if (userData.isSocial) {
+  if (userData.isSocial && userData.role === ENUM_USER_ROLE.CLIENT) {
     userData.isEmailVerified = true;
 
     const payload = {
@@ -229,7 +233,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
       userData.documents = imagePath;
     }
 
-    let updatedUser;
+    let updatedUser: any;
 
     // Role-based field whitelisting
     switch (existingUser.profile.role) {
@@ -274,6 +278,21 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    if (existingUser.profile.role === ENUM_USER_ROLE.CLIENT && userData.status === 'pending' && updatedUser.status === 'active') {
+      // send email verification mail
+      const content = `Your account now activated!`;
+      // const verificationLink = `${server_base_url}/v1/auth/verify-email/${user._id}?userCode=${userData.verification.code}`
+      // const content = `Click the following link to verify your email: ${verificationLink}`
+      const mailOptions = {
+        from: config.gmail_app_user as string,
+        to: userData.email,
+        subject: 'U-Tee-Hub - Account Activated',
+        text: content,
+      };
+
+      sendMail(mailOptions);
+    }
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,

@@ -7,6 +7,6 @@ const messageRouter = express.Router();
 messageRouter.use(authorization(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.VENDOR));
 
 // messageRouter.post('/send', messageControllers.sendMessage);
-messageRouter.get('/retrive/:conversationId', messageControllers.retrieveAllMessageByConversationId);
+messageRouter.get('/retrieve/:conversationId', messageControllers.retrieveAllMessageByConversationId);
 
 export default messageRouter;
