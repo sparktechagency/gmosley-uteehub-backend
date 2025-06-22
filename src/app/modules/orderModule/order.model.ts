@@ -92,10 +92,18 @@ export const orderSchema = new mongoose.Schema<IOrder>(
     },
     paymentStatus: {
       type: String,
-      enum: ['hold', 'paid', 'failed'],
-      default: 'hold',
+      enum: ['due', 'hold', 'paid', 'failed'],
+      default: 'due',
     },
     shippingAddress: {
+      type: String,
+      default: '',
+    },
+    sessionId: {
+      type: String,
+      default: '',
+    },
+    tnxId: {
       type: String,
       default: '',
     },

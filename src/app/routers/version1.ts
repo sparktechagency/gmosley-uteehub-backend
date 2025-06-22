@@ -13,6 +13,7 @@ import orderRouter from '../modules/orderModule/order.routes';
 import supportRouter from '../modules/supportModule/support.routes';
 import conversationRouter from '../modules/conversationModule/conversations.routes';
 import messageRouter from '../modules/messageModule/message.routes';
+import walletRouter from '../modules/walletModule/wallet.routes';
 
 const routersVersionOne = express.Router();
 
@@ -31,6 +32,7 @@ routersVersionOne.use('/order', orderRouter);
 routersVersionOne.use('/support', supportRouter);
 routersVersionOne.use('/conversation', conversationRouter);
 routersVersionOne.use('/message', messageRouter);
+routersVersionOne.use('/wallet', walletRouter);
 
 // settings
 routersVersionOne.use('/about-us', aboutUsRouter);

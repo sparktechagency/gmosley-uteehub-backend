@@ -28,6 +28,8 @@ export interface IOrder extends Document {
     summery: string;
     paymentStatus: string;
     shippingAddress: string
+    sessionId: string;
+    tnxId: string;
     createdAt: Date;
     updatedAt: Date;
 }

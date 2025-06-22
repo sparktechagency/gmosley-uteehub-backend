@@ -8,6 +8,9 @@ import fileUploader from '../../../utils/fileUploader';
 import CustomError from '../../errors';
 import Stripe from 'stripe';
 import config from '../../../config';
+import conversationService from '../conversationModule/conversation.service';
+import messageServices from '../messageModule/message.services';
+import walletServices from '../walletModule/wallet.services';
 
 const stripe = new Stripe(config.stripe_secret_key as string);
 
@@ -60,7 +63,119 @@ const getSpecificOrder = asyncHandler(async (req: Request, res: Response) => {
 
 // controller for update specific order
 const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => {
-  const order = await orderServices.updateSpecificOrder(req.params.id, req.body);
+  const updateData = req.body;
+  const orderId = req.params.id;
+
+  const existOrder = await orderServices.retrieveSpecificOrder(orderId);
+  if (!existOrder) {
+    throw new CustomError.NotFoundError('No order found!');
+  }
+  if (updateData.status === existOrder.status) {
+    throw new CustomError.BadRequestError(`Order already ${existOrder.status}`);
+  }
+
+  const conversation = await conversationService.retriveConversationByMemberIds([
+    existOrder.client.toString(),
+    existOrder.vendor.toString(),
+  ]);
+
+  switch (updateData.status) {
+    case 'accepted':
+      if (existOrder.status !== 'offered') {
+        throw new CustomError.BadRequestError('Only offered order can be accepted!');
+      }
+
+      const session: any = await stripe.checkout.sessions.retrieve(updateData.sessionId, {
+        expand: ['payment_intent'],
+      });
+      if (!session.payment_intent) {
+        throw new CustomError.BadRequestError('Payment intent not found!');
+      }
+      if (session.payment_status !== 'paid') {
+        throw new CustomError.BadRequestError('Payment is not completed!');
+      }
+
+      updateData.paymentStatus = 'hold';
+      updateData.tnxId = session.payment_intent.latest_charge;
+
+      // create a message for accept the order
+      if (conversation) {
+        const messagePayload = {
+          conversationId: conversation._id,
+          senderId: existOrder.vendor,
+          text: 'The order has been accepted.',
+        };
+        await messageServices.createMessage(messagePayload);
+      }
+      break;
+    case 'delivery-requested':
+      if (existOrder.status !== 'accepted') {
+        throw new CustomError.BadRequestError('Only accepted order can be delivery requested!');
+      }
+
+      if (conversation) {
+        const messagePayload = {
+          conversationId: conversation._id,
+          senderId: existOrder.vendor,
+          text: updateData.description,
+          attachment: updateData.workSamples,
+        };
+        await messageServices.createMessage(messagePayload);
+      }
+      break;
+    case 'delivery-confirmed':
+      if (existOrder.status !== 'delivery-requested') {
+        throw new CustomError.BadRequestError('Only delivery requested order can be delivery confirmed!');
+      }
+
+      const vendorWallet = await walletServices.getSpecificWalletByUserId(existOrder.vendor.toString());
+      if (!vendorWallet) {
+        throw new CustomError.NotFoundError('Vendor wallet not found!');
+      }
+
+      // calculate the vendor amount. system fee 20%
+      const systemFee = (existOrder.price * 20) / 100;
+      const vendorAmount = existOrder.price - systemFee;
+
+      // add vendor amount to vendor wallet
+      vendorWallet.balance.amount += vendorAmount;
+      vendorWallet.transactionHistory.push({
+        amount: vendorAmount,
+        type: 'credit',
+        transactionAt: new Date(),
+      });
+      await vendorWallet.save();
+
+      if (conversation) {
+        const messagePayload = {
+          conversationId: conversation._id,
+          senderId: existOrder.client,
+          text: 'Congrulations, The order has been delivery confirmed.',
+        };
+        await messageServices.createMessage(messagePayload);
+      }
+      updateData.status = 'delivery-confirmed';
+      break;
+    case 'revision':
+      if (existOrder.status !== 'delivery-requested') {
+        throw new CustomError.BadRequestError('Only delivery requested order can be revision!');
+      }
+
+      if (conversation) {
+        const messagePayload = {
+          conversationId: conversation._id,
+          senderId: existOrder.client,
+          text: 'The order has been revision.',
+        };
+        await messageServices.createMessage(messagePayload);
+      }
+      updateData.status = 'revision';
+      break;
+    default:
+      break;
+  }
+
+  const order = await orderServices.updateSpecificOrder(orderId, updateData);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     status: 'success',
@@ -78,10 +193,17 @@ const extendOrderDeadline = asyncHandler(async (req: Request, res: Response) => 
     throw new CustomError.NotFoundError('No order found!');
   }
 
+  const conversation = await conversationService.retriveConversationByMemberIds([order.client.toString(), order.vendor.toString()]);
+
   // Optional: Prevent multiple pending requests
   const hasPendingRequest = order.extentionHistory.some((ext) => ext.status === 'pending');
   if (hasPendingRequest) {
     throw new CustomError.BadRequestError('There is already a pending deadline extension request.');
+  }
+
+  // check new date less then last date
+  if (new Date(newDate) <= new Date(order.deliveryDate)) {
+    throw new CustomError.BadRequestError('You already have the remaining deadline till ' + order.deliveryDate.toDateString());
   }
 
   const extensionRequest = {
@@ -93,6 +215,15 @@ const extendOrderDeadline = asyncHandler(async (req: Request, res: Response) => 
 
   order.extentionHistory.push(extensionRequest);
   await order.save();
+
+  if (conversation) {
+    const messagePayload = {
+      conversationId: conversation._id,
+      senderId: order.client,
+      text: `The order deadline has been extend request from Date ${order.deliveryDate.toDateString()} to ${new Date(newDate).toDateString()}`,
+    };
+    await messageServices.createMessage(messagePayload);
+  }
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -110,6 +241,8 @@ const approveOrRejectDeadlineExtendRequest = asyncHandler(async (req: Request, r
   if (!order) {
     throw new CustomError.NotFoundError('No order found!');
   }
+
+  const conversation = await conversationService.retriveConversationByMemberIds([order.client.toString(), order.vendor.toString()]);
 
   const pendingRequestIndex = order.extentionHistory.findIndex((ext) => ext.status === 'pending');
 
@@ -129,7 +262,20 @@ const approveOrRejectDeadlineExtendRequest = asyncHandler(async (req: Request, r
     throw new CustomError.BadRequestError('Invalid status value.');
   }
 
+  if (order.status === 'revision') {
+    order.status = 'accepted';
+  }
+
   await order.save();
+
+  if (conversation) {
+    const messagePayload = {
+      conversationId: conversation._id,
+      senderId: order.client,
+      text: `The order deadline has been ${status} from Date ${order.deliveryDate.toDateString()} to ${new Date(pendingRequest.newDate).toDateString()}`,
+    };
+    await messageServices.createMessage(messagePayload);
+  }
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

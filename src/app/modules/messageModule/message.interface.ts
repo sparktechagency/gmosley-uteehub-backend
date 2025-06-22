@@ -4,7 +4,7 @@ export interface IMessage extends Document {
     conversationId: Types.ObjectId;
     senderId: Types.ObjectId;
     text: string;
-    attachment: string;
+    attachment: string[];
     seenBy: {
         user: Types.ObjectId;
         seenAt: Date;

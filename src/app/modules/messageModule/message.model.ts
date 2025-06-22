@@ -15,9 +15,9 @@ const MessageSchema = new mongoose.Schema(
     text: {
       type: String,
     },
-    attachment: {
+    attachment: [{
       type: String,
-    },
+    }],
     seenBy: [
       {
         user: {

@@ -13,6 +13,8 @@ import mongoose, { ClientSession, Types } from 'mongoose';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import clientServices from '../clientModule/client.services';
 import vendorServices from '../vendorModule/vendor.services';
+import walletUtils from '../walletModule/wallet.utils';
+import { CURRENCY_ENUM } from '../../../enums/currency';
 
 // controller for create new user
 const createUser = asyncHandler(async (req: Request, res: Response) => {
@@ -112,6 +114,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
           user.profile.role = ENUM_USER_ROLE.VENDOR;
         }
         await user.save({ session });
+        await walletUtils.createOrUpdateSpecificWallet(user.profile.id as unknown as string, { balance: { amount: userData.balance, currency: CURRENCY_ENUM.USD } });
         break;
       default:
         throw new CustomError.BadRequestError('Invalid role!');
@@ -290,7 +293,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
         subject: 'U-Tee-Hub - Account Activated',
         text: content,
       };
-
+ 
       sendMail(mailOptions);
     }
 
