@@ -114,7 +114,9 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
           user.profile.role = ENUM_USER_ROLE.VENDOR;
         }
         await user.save({ session });
-        await walletUtils.createOrUpdateSpecificWallet(user.profile.id as unknown as string, { balance: { amount: userData.balance, currency: CURRENCY_ENUM.USD } });
+        await walletUtils.createOrUpdateSpecificWallet(user.profile.id as unknown as string, {
+          balance: { amount: userData.balance, currency: CURRENCY_ENUM.USD },
+        });
         break;
       default:
         throw new CustomError.BadRequestError('Invalid role!');
@@ -293,7 +295,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
         subject: 'U-Tee-Hub - Account Activated',
         text: content,
       };
- 
+
       sendMail(mailOptions);
     }
 

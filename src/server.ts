@@ -3,9 +3,11 @@ import config from './config';
 import app from './app';
 import http from 'http';
 import { initSocket } from './app/socket/config.socket';
+import cron from 'node-cron';
+import orderServices from './app/modules/orderModule/order.services';
 
 // let server: any;
-const server = http.createServer(app)
+const server = http.createServer(app);
 
 initSocket(server);
 
@@ -13,6 +15,15 @@ initSocket(server);
 process.on('uncaughtException', (error) => {
   console.log('uncaughtException error', error);
   process.exit(1);
+});
+
+// schedully update order status (make cancelled when order is past using node-cron)
+cron.schedule('0 0 * * *', async () => {
+  await orderServices.updateAllPastOrders();
+  console.log(`[CRON] Cancelled overdue orders`);
+
+  await orderServices.autoAcceptDeliveredOrders();
+  console.log(`[CRON] Auto accepted overdue orders`);
 });
 
 const startServer = async () => {

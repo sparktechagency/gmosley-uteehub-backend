@@ -78,7 +78,7 @@ export const orderSchema = new mongoose.Schema<IOrder>(
     ],
     status: {
       type: String,
-      enum: ['offered', 'rejected', 'accepted', 'shipped', 'delivered', 'revision', 'completed'],
+      enum: ['offered', 'rejected', 'accepted', 'delivery-requested', 'delivery-confirmed', 'revision', 'cancelled'],
       default: 'offered',
     },
     deliveryOption: {
