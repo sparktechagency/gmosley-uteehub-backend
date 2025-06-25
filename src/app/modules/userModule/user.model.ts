@@ -70,13 +70,17 @@ export const userSchema = new mongoose.Schema<IUser>(
       },
     },
     isOnline: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
     lastSeen: {
-        type: Date,
-        default: Date.now,
-    }
+      type: Date,
+      default: Date.now,
+    },
+    stripeAccountId: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -105,8 +109,8 @@ userSchema.methods.compareVerificationCode = function (userPlaneCode: string) {
 };
 
 // userSchema.index({
-  // firstName: 'text',
-  // lastName: 'text',
+// firstName: 'text',
+// lastName: 'text',
 //   email: 'text',
 //   phone: 'text',
 // });

@@ -24,6 +24,9 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().min(1, 'Frontend URL is required'),
 
   STRIPE_SECRET_KEY: z.string().min(1, 'Stripe secret key is required'),
+
+  WITHDRAWAL_MIN_AMOUNT: z.preprocess((val) => Number(val), z.number().default(10)),
+  WITHDRAWAL_COOLDOWN_HOURS: z.preprocess((val) => Number(val), z.number().default(12)),
 });
 
 const envVars = envSchema.parse(process.env);
@@ -46,4 +49,7 @@ export default {
   frontend_url: envVars.FRONTEND_URL,
 
   stripe_secret_key: envVars.STRIPE_SECRET_KEY,
+
+  withdrawal_min_amount: envVars.WITHDRAWAL_MIN_AMOUNT,
+  withdrawal_cooldown_hours: envVars.WITHDRAWAL_COOLDOWN_HOURS,
 };

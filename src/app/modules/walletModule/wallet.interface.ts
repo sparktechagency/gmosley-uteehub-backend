@@ -14,4 +14,5 @@ export interface IWallet extends Document {
     type: string;
     transactionAt: Date;
   }[];
+  lastWithdrawal: Date | null;
 }

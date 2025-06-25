@@ -15,6 +15,9 @@ import clientServices from '../clientModule/client.services';
 import vendorServices from '../vendorModule/vendor.services';
 import walletUtils from '../walletModule/wallet.utils';
 import { CURRENCY_ENUM } from '../../../enums/currency';
+import stripe from 'stripe';
+
+const stripeClient = new stripe(config.stripe_secret_key as string);
 
 // controller for create new user
 const createUser = asyncHandler(async (req: Request, res: Response) => {
@@ -144,6 +147,21 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     };
 
     sendMail(mailOptions);
+  }
+
+  // create stripe account for vendor
+  if (userData.role === ENUM_USER_ROLE.VENDOR) {
+    const stripeAccount = await stripeClient.accounts.create({
+      type: 'express',
+      country: 'US',
+      email: userData.email,
+      business_profile: {
+        name: userData.name,
+      },
+    });
+
+    user.stripeAccountId = stripeAccount.id;
+    await user.save();
   }
 
   sendResponse(res, {

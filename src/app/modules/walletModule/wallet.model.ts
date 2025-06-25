@@ -23,6 +23,7 @@ const walletSchema = new mongoose.Schema<IWallet>(
         transactionAt: { type: Date },
       },
     ],
+    lastWithdrawal: { type: Date, default: null },
   },
   {
     timestamps: true,

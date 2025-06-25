@@ -20,6 +20,7 @@ interface IUser extends Document {
   }
   isOnline: boolean;
   lastSeen: Date;
+  stripeAccountId: string;
 
   // method declarations
   comparePassword(userPlanePassword: string): boolean
