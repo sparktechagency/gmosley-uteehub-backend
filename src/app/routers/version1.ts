@@ -14,6 +14,9 @@ import supportRouter from '../modules/supportModule/support.routes';
 import conversationRouter from '../modules/conversationModule/conversations.routes';
 import messageRouter from '../modules/messageModule/message.routes';
 import walletRouter from '../modules/walletModule/wallet.routes';
+import categoryRouter from '../modules/categoryModule/category.routes';
+import productRouter from '../modules/productModule/product.routes';
+import generalOrderRouter from '../modules/generalOrderModule/generalOrder.routes';
 
 const routersVersionOne = express.Router();
 
@@ -33,6 +36,9 @@ routersVersionOne.use('/support', supportRouter);
 routersVersionOne.use('/conversation', conversationRouter);
 routersVersionOne.use('/message', messageRouter);
 routersVersionOne.use('/wallet', walletRouter);
+routersVersionOne.use('/category', categoryRouter);
+routersVersionOne.use('/product', productRouter);
+routersVersionOne.use('/general-order', generalOrderRouter);
 
 // settings
 routersVersionOne.use('/about-us', aboutUsRouter);

@@ -11,6 +11,7 @@ import config from '../../../config';
 import conversationService from '../conversationModule/conversation.service';
 import messageServices from '../messageModule/message.services';
 import walletServices from '../walletModule/wallet.services';
+import notificationServices from '../notificationModule/notification.services';
 
 const stripe = new Stripe(config.stripe_secret_key as string);
 
@@ -31,6 +32,21 @@ const createOrder = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const order = await orderServices.createOrder(orderData);
+
+  // create notification
+  const notificationData = {
+    consumer: order.client,
+    content: {
+      title: 'New Offer',
+      message: `You have received a new offer`,
+      source: {
+        type: 'order',
+        id: order._id,
+      },
+    },
+  };
+  await notificationServices.createNotification(notificationData);
+
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     status: 'success',
@@ -107,6 +123,20 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
         };
         await messageServices.createMessage(messagePayload);
       }
+
+      // create notification
+      const notificationData = {
+        consumer: existOrder.vendor,
+        content: {
+          title: 'Order Accepted',
+          message: `Your order has been accepted by the client`,
+          source: {
+            type: 'order',
+            id: existOrder._id,
+          },
+        },
+      };
+      await notificationServices.createNotification(notificationData);
       break;
     case 'delivery-requested':
       if (existOrder.status !== 'accepted') {
@@ -285,7 +315,7 @@ const approveOrRejectDeadlineExtendRequest = asyncHandler(async (req: Request, r
 });
 
 const initiateOrderPayment = asyncHandler(async (req: Request, res: Response) => {
-  const { customerEmail, amount, currency, quantity } = req.body;
+  const { customerEmail, amount, currency, quantity = 1 } = req.body;
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
