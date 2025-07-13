@@ -67,7 +67,7 @@ const createGeneralOrder = asyncHandler(async (req: Request, res: Response) => {
   orderData.currency = CURRENCY_ENUM.USD;
   orderData.tnxId = session.payment_intent.latest_charge;
 
-  const generalOrder = await generalOrderServices.createGeneralOrder(orderData);
+  const generalOrder: any = await generalOrderServices.createGeneralOrder(orderData);
 
   // update product quantity
   await Promise.all(
@@ -93,7 +93,7 @@ const createGeneralOrder = asyncHandler(async (req: Request, res: Response) => {
       message: `You have received a new order`,
       source: {
         type: 'order',
-        id: orderData._id,
+        id: generalOrder._id,
       },
     },
   };

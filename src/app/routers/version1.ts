@@ -17,6 +17,7 @@ import walletRouter from '../modules/walletModule/wallet.routes';
 import categoryRouter from '../modules/categoryModule/category.routes';
 import productRouter from '../modules/productModule/product.routes';
 import generalOrderRouter from '../modules/generalOrderModule/generalOrder.routes';
+import notificationRouter from '../modules/notificationModule/notification.routes';
 
 const routersVersionOne = express.Router();
 
@@ -39,6 +40,7 @@ routersVersionOne.use('/wallet', walletRouter);
 routersVersionOne.use('/category', categoryRouter);
 routersVersionOne.use('/product', productRouter);
 routersVersionOne.use('/general-order', generalOrderRouter);
+routersVersionOne.use('/notification', notificationRouter);
 
 // settings
 routersVersionOne.use('/about-us', aboutUsRouter);

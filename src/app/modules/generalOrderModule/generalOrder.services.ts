@@ -19,8 +19,9 @@ class GeneralOrderService {
   }> {
     const result = new QueryBuilder(
       GeneralOrder.find({})
-        .populate({ path: 'client', select: '-userId -createdAt -updatedAt -__v' })
-        .populate({ path: 'products.productId', select: '-category -createdAt -updatedAt -__v' }),
+        .populate({ path: 'client', select: 'profile email phone', populate: { path: 'profile.id', select: 'name gender image -_id' } })
+        .populate({ path: 'products.productId', select: '-category -createdAt -updatedAt -__v' })
+        .populate({ path: 'vendor', select: 'profile email phone', populate: { path: 'profile.id', select: 'name gender image -_id' } }),
       query,
     )
       .filter()
@@ -39,7 +40,10 @@ class GeneralOrderService {
   }
 
   async retrieveSpecificGeneralOrder(orderId: string) {
-    const generalOrder = await GeneralOrder.findById(orderId);
+    const generalOrder = await GeneralOrder.findById(orderId)
+      .populate({ path: 'client', select: 'profile email phone', populate: { path: 'profile.id', select: 'name gender image -_id' } })
+      .populate({ path: 'products.productId', select: '-category -createdAt -updatedAt -__v' })
+      .populate({ path: 'vendor', select: 'profile email phone', populate: { path: 'profile.id', select: 'name gender image -_id' } });
     return generalOrder;
   }
 

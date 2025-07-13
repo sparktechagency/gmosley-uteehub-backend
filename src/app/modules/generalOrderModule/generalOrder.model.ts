@@ -4,8 +4,8 @@ import { IGeneralOrder } from './generalOrder.interface';
 const generalOrderSchema = new mongoose.Schema<IGeneralOrder>(
     {
         orderId: String,
-        vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'vendor' },
-        client: { type: mongoose.Schema.Types.ObjectId, ref: 'client' },
+        vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+        client: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
         price: Number,
         currency: String,
         products: [{
