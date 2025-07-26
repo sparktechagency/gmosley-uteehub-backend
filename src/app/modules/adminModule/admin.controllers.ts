@@ -29,7 +29,7 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
 const getAllAdmin = asyncHandler(async (req: Request, res: Response) => {
   const admins = await adminServices.getAllAdmin();
   // console.log(admins)
-  const adminsAcceptSuperAdmin = admins.filter((admin) => admin.role !== 'super-admin');
+  const adminsAcceptSuperAdmin = admins.filter((admin) => admin.role !== 'super_admin');
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

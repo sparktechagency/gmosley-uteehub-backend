@@ -87,7 +87,6 @@ export const vendorSchema = new mongoose.Schema<IVendor>(
       },
       coordinates: {
         type: [Number], // [longitude, latitude]
-        required: true,
       },
     },
     image: {

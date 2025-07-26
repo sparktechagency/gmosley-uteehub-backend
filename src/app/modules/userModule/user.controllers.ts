@@ -149,20 +149,20 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     sendMail(mailOptions);
   }
 
-  // create stripe account for vendor
-  if (userData.role === ENUM_USER_ROLE.VENDOR) {
-    const stripeAccount = await stripeClient.accounts.create({
-      type: 'express',
-      country: 'US',
-      email: userData.email,
-      business_profile: {
-        name: userData.name,
-      },
-    });
+  // create stripe account for vendor (Apatotoo comment kore rakhchi, client theke stripe login kore nite hobe)
+  // if (userData.role === ENUM_USER_ROLE.VENDOR) {
+  //   const stripeAccount = await stripeClient.accounts.create({
+  //     type: 'express',
+  //     country: 'US',
+  //     email: userData.email,
+  //     business_profile: {
+  //       name: userData.name,
+  //     },
+  //   });
 
-    user.stripeAccountId = stripeAccount.id;
-    await user.save();
-  }
+  //   user.stripeAccountId = stripeAccount.id;
+  //   await user.save();
+  // }
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,

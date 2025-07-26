@@ -23,7 +23,7 @@ const adminLogin = asyncHandler(async (req: Request, res: Response) => {
     throw new CustomError.BadRequestError('Your current account is disabled!');
   }
   if (admin.status === 'blocked') {
-    throw new CustomError.BadRequestError('Currently your account is blocked by super-admin!');
+    throw new CustomError.BadRequestError('Currently your account is blocked by super_admin!');
   }
 
   // check the password is correct
