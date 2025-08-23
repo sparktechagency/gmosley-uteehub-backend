@@ -20,4 +20,7 @@ categoryRouter.patch('/update/:id', categoryControllers.updateSpecificCategory);
 // Route to delete specific category (only accessible to vendor)
 categoryRouter.delete('/delete/:id', categoryControllers.deleteSpecificCategory);
 
+// Route to retrieve categories by creator id (only accessible to vendor)
+categoryRouter.get('/retrieve/vendor/:creatorId', categoryControllers.retrieveCategoriesByCreatorId);
+
 export default categoryRouter;

@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import categoryServices from './category.services';
 import fileUploader from '../../../utils/fileUploader';
 import CustomError from '../../errors';
+import userServices from '../userModule/user.services';
 
 // controller for create category
 const createCategory = asyncHandler(async (req: Request, res: Response) => {
@@ -13,6 +14,15 @@ const createCategory = asyncHandler(async (req: Request, res: Response) => {
   const files = req.files;
   if (!categoryData.name) {
     throw new Error('Name is required');
+  }
+
+  const user = await userServices.getSpecificUser(categoryData.creator);
+  if (!user) {
+    throw new CustomError.NotFoundError('User not found!');
+  }
+
+  if(user.profile.role !== 'vendor'){
+    throw new CustomError.BadRequestError('Only vendor can create category!');
   }
 
   if(files && files.image){
@@ -90,10 +100,23 @@ const deleteSpecificCategory = asyncHandler(async (req: Request, res: Response) 
   });
 });
 
+// controller for retrieve categories by creator id
+const retrieveCategoriesByCreatorId = asyncHandler(async (req: Request, res: Response) => {
+  const { creatorId } = req.params;
+  const categories = await categoryServices.retrieveCategoriesByCreatorId(creatorId, req.query);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'Categories retrieved successfully',
+    data: categories,
+  });
+});
+
 export default {
   createCategory,
   getAllCategories,
   getSpecificCategory,
   updateSpecificCategory,
   deleteSpecificCategory,
+  retrieveCategoriesByCreatorId,
 };

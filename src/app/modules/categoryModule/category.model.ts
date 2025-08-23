@@ -5,6 +5,7 @@ const categorySchema = new mongoose.Schema<ICategory>(
     {
         name: { type: String, required: true },
         image: { type: String, required: true },
+        creator: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
     },
     {
         timestamps: true,

@@ -91,8 +91,8 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
   }
 
   const conversation = await conversationService.retriveConversationByMemberIds([
-    existOrder.client.toString(),
-    existOrder.vendor.toString(),
+    existOrder.client?.toString(),
+    existOrder.vendor?.toString(),
   ]);
 
   switch (updateData.status) {
@@ -158,7 +158,7 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
         throw new CustomError.BadRequestError('Only delivery requested order can be delivery confirmed!');
       }
 
-      const vendorWallet = await walletServices.getSpecificWalletByUserId(existOrder.vendor.toString());
+      const vendorWallet = await walletServices.getSpecificWalletByUserId(existOrder.vendor?.toString());
       if (!vendorWallet) {
         throw new CustomError.NotFoundError('Vendor wallet not found!');
       }
@@ -223,7 +223,7 @@ const extendOrderDeadline = asyncHandler(async (req: Request, res: Response) => 
     throw new CustomError.NotFoundError('No order found!');
   }
 
-  const conversation = await conversationService.retriveConversationByMemberIds([order.client.toString(), order.vendor.toString()]);
+  const conversation = await conversationService.retriveConversationByMemberIds([order.client?.toString(), order.vendor?.toString()]);
 
   // Optional: Prevent multiple pending requests
   const hasPendingRequest = order.extentionHistory.some((ext) => ext.status === 'pending');
@@ -272,7 +272,7 @@ const approveOrRejectDeadlineExtendRequest = asyncHandler(async (req: Request, r
     throw new CustomError.NotFoundError('No order found!');
   }
 
-  const conversation = await conversationService.retriveConversationByMemberIds([order.client.toString(), order.vendor.toString()]);
+  const conversation = await conversationService.retriveConversationByMemberIds([order.client?.toString(), order.vendor?.toString()]);
 
   const pendingRequestIndex = order.extentionHistory.findIndex((ext) => ext.status === 'pending');
 
