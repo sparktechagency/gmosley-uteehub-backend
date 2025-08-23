@@ -1,6 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export interface IProduct extends Document {
+    creator: Types.ObjectId;
     name: string;
     category: Types.ObjectId;
     isFeatured: boolean;

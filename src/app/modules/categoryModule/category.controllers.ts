@@ -12,17 +12,20 @@ import userServices from '../userModule/user.services';
 const createCategory = asyncHandler(async (req: Request, res: Response) => {
   const categoryData = req.body;
   const files = req.files;
-  if (!categoryData.name) {
-    throw new Error('Name is required');
-  }
+  const userId = req.user?.id
 
-  const user = await userServices.getSpecificUser(categoryData.creator);
+  const user = await userServices.getSpecificUser(userId);
   if (!user) {
     throw new CustomError.NotFoundError('User not found!');
   }
 
   if(user.profile.role !== 'vendor'){
     throw new CustomError.BadRequestError('Only vendor can create category!');
+  }
+  categoryData.creator = userId;
+
+  if (!categoryData.name) {
+    throw new Error('Name is required');
   }
 
   if(files && files.image){

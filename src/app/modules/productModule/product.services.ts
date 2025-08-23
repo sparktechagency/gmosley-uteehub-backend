@@ -16,6 +16,9 @@ class ProductServices {
     };
     data: IProduct[];
   }> {
+    if (query['isFeatured']) {
+      query['isFeatured'] = query['isFeatured'] === 'true';
+    }
     const result = new QueryBuilder(Product.find({}), query).filter().search(['name']).sort().pagination().select();
 
     const totalCount = await result.countTotal();
@@ -37,6 +40,26 @@ class ProductServices {
 
   async deleteProduct(id: string) {
     return await Product.findByIdAndDelete(id);
+  }
+
+  async retrieveProductsByCreatorId(creatorId: string, query: Record<string, unknown>): Promise<{
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+    data: IProduct[];
+  }> {
+    const result = new QueryBuilder(Product.find({ creator: creatorId }), query).filter().search(['name']).sort().pagination().select();
+
+    const totalCount = await result.countTotal();
+    const products = await result.modelQuery;
+
+    return {
+      meta: totalCount,
+      data: products,
+    };
   }
 }
 

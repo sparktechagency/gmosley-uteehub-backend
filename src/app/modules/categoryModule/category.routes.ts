@@ -1,12 +1,13 @@
 import express from 'express';
 import authorization from '../../middlewares/authorization';
 import categoryControllers from './category.controllers';
+import { ENUM_USER_ROLE } from '../../../enums/user';
 
 const categoryRouter = express.Router();
 // categoryRouter.use(authorization('vendor'));
 
 // Route to create category (only accessible to vendor)
-categoryRouter.post('/create', categoryControllers.createCategory);
+categoryRouter.post('/create', authorization(ENUM_USER_ROLE.VENDOR), categoryControllers.createCategory);
 
 // Route to retrieve all categories (accessible to everyone)
 categoryRouter.get('/retrieve', categoryControllers.getAllCategories);

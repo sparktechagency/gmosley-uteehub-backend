@@ -10,5 +10,6 @@ productRouter.get('/retrieve', productControllers.getAllProducts);
 productRouter.get('/retrieve/:id', productControllers.getSpecificProduct);
 productRouter.patch('/update/:id', authorization(ENUM_USER_ROLE.VENDOR), productControllers.updateSpecificProduct);
 productRouter.delete('/delete/:id', authorization(ENUM_USER_ROLE.VENDOR), productControllers.deleteSpecificProduct);
+productRouter.get('/retrieve/vendor/:creatorId', productControllers.retrieveProductsByCreatorId);
 
 export default productRouter;

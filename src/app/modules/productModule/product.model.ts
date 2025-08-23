@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { CURRENCY_ENUM } from '../../../enums/currency';
 
 const productSchema = new mongoose.Schema({
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
   name: { type: String, required: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'category', required: true },
   isFeatured: { type: Boolean, default: false },
