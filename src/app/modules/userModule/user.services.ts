@@ -75,7 +75,7 @@ const getSpecificUserByEmail = async (email: string): Promise<IUser> => {
 
 // service for update specific user
 const updateSpecificUser = async (id: string, data: Partial<IUser>, session?: ClientSession) => {
-  console.log(data);
+  // console.log(data);
   return await User.findOneAndUpdate({ _id: id }, data, { session });
 };
 

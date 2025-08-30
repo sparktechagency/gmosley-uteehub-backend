@@ -276,6 +276,10 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
       }
 
       case ENUM_USER_ROLE.VENDOR: {
+        const location = {
+          type: 'Point',
+          coordinates: [Number(userData.lng), Number(userData.lat)],
+        }
         const vendorUpdatePayload = {
           name: userData.name,
           address: userData.address,
@@ -286,6 +290,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
           radius: userData.radius,
           rating: userData.rating,
           image: userData.image,
+          location,
         };
         updatedUser = await vendorServices.updateSpecificVendor(existingUser.profile.id as unknown as string, vendorUpdatePayload, session);
         await userServices.updateSpecificUser(id, userData, session);
