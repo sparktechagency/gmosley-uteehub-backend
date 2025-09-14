@@ -3,6 +3,7 @@ import asyncHandler from '../../../shared/asyncHandler';
 import conversationService from './conversation.service';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 
 const createConversation = asyncHandler(async (req: Request, res: Response) => {
   const { members: memberIds } = req.body;

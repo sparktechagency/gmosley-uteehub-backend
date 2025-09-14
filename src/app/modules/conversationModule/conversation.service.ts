@@ -1,3 +1,4 @@
+import mongoose, { ObjectId } from 'mongoose';
 import { IConversation } from './conversation.interface';
 import Conversation from './conversation.model';
 
