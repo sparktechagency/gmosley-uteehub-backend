@@ -33,9 +33,9 @@ const sendMail = async ({ from, to, subject, text }: MailOptions): Promise<boole
     // console.log('Message sent: %s', info.messageId);
     return true;
   } catch (error) {
-    throw new CustomError.BadRequestError('Failed to send mail!');
+    // throw new CustomError.BadRequestError('Failed to send mail!');
     // console.error('Error sending mail: ', error);
-    // return false;
+    return false;
   }
 };
 
