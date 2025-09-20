@@ -28,13 +28,17 @@ const deleteSpecificVendor = async (id: string, session?: ClientSession) => {
 
 // service for retrieve nearest vendor
 const retrieveNearestVendor = async (clientLocation: string) => {
-  const [lat, lon] = clientLocation.split(',').map(Number);
+  let [first, second] = clientLocation.split(', ').map(Number);
+
+  let lat = first > 90 ? second : first;
+  let lng = first > 90 ? first : second;
+  console.log(lat, lng)
   return await Vendor.find({
     location: {
       $near: {
         $geometry: {
           type: 'Point',
-          coordinates: [lon, lat], // MongoDB expects [lng, lat]
+          coordinates: [lng, lat], // MongoDB expects [lng, lat]
         },
         $maxDistance: 1000, // in meters
       },
