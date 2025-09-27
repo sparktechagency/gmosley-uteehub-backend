@@ -12,6 +12,7 @@ userRouter.post(
   requestValidator(UserValidationZodSchema.createUserZodSchema),
   userControllers.createUser
 );
+userRouter.post('/file-upload', userControllers.fileUpload);
 userRouter.get('/retrieve/all', userControllers.getAllUser);
 
 userRouter.get('/retrieve/:id', requestValidator(UserValidationZodSchema.getSpecificUserZodSchema), userControllers.getSpecificUser);
@@ -30,5 +31,7 @@ userRouter.patch(
 //   userControllers.deleteSpecificUser,
 // );
 // userRouter.patch('/update/profile-picture/:id', authentication('patient', 'therapist'), requestValidator(UserValidationZodSchema.getSpecificUserZodSchema), userControllers.changeUserProfileImage)
+
+
 
 export default userRouter;

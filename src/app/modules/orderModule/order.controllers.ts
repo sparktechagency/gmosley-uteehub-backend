@@ -202,6 +202,7 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
       updateData.status = 'revision';
       break;
     default:
+      throw new CustomError.BadRequestError('Invalid order status! Please provide a valid order status.');
       break;
   }
 

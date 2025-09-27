@@ -143,9 +143,34 @@ const deleteGeneralOrder = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const updateGeneralOrder = asyncHandler(async (req: Request, res: Response) => {
+  const updateData = req.body;
+  const orderId = req.params.id;
+
+  if (!updateData.status) {
+    throw new CustomError.BadRequestError('Status is required!');
+  }
+
+  const generalOrder = await generalOrderServices.retrieveSpecificGeneralOrder(orderId);
+  if (!generalOrder) {
+    throw new CustomError.NotFoundError('General order not found!');
+  }
+
+  const updatedGeneralOrder = await generalOrderServices.updateGeneralOrder(orderId, updateData);
+  if (!updatedGeneralOrder?.isModified) {
+    throw new CustomError.NotFoundError('Failed to update general order!');
+  }
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'General order updated successfully',
+  });
+})
+
 export default {
   createGeneralOrder,
   getAllGeneralOrders,
   getSpecificGeneralOrder,
   deleteGeneralOrder,
+  updateGeneralOrder,
 };

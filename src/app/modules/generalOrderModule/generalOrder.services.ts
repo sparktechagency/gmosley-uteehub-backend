@@ -51,6 +51,11 @@ class GeneralOrderService {
     const generalOrder = await GeneralOrder.findByIdAndDelete(orderId);
     return generalOrder;
   }
+
+  async updateGeneralOrder(orderId: string, updateData: IGeneralOrder) {
+    const generalOrder = await GeneralOrder.findByIdAndUpdate(orderId, updateData, { new: true });
+    return generalOrder;
+  }
 }
 
 export default new GeneralOrderService();

@@ -117,7 +117,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
           user.profile.role = ENUM_USER_ROLE.VENDOR;
         }
         await user.save({ session });
-        await walletUtils.createOrUpdateSpecificWallet(user.profile.id as unknown as string, {
+        await walletUtils.createOrUpdateSpecificWallet(user._id as unknown as string, {
           balance: { amount: userData.balance, currency: CURRENCY_ENUM.USD },
         });
         break;
@@ -334,6 +334,22 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const fileUpload = asyncHandler(async (req: Request, res: Response) => {
+  const files = req.files;
+  if (!files || !files.file) {
+    throw new CustomError.BadRequestError('No files uploaded!');
+  }
+
+  const imagePath = await fileUploader(files, `files-${Date.now()}`, 'file');
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'File uploaded successfully',
+    data: imagePath,
+  });
+})
+
 export default {
   createUser,
   getSpecificUser,
@@ -341,4 +357,5 @@ export default {
   // deleteSpecificUser,
   updateSpecificUser,
   // changeUserProfileImage,
+  fileUpload,
 };
