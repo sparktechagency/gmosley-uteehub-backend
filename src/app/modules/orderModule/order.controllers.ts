@@ -139,8 +139,8 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
       await notificationServices.createNotification(notificationData);
       break;
     case 'delivery-requested':
-      if (existOrder.status !== 'accepted') {
-        throw new CustomError.BadRequestError('Only accepted order can be delivery requested!');
+      if (existOrder.status !== 'accepted' && existOrder.status !== 'revision') {
+        throw new CustomError.BadRequestError('Only accepted or revision order can be delivery requested!');
       }
 
       if (conversation) {
@@ -200,6 +200,24 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
         await messageServices.createMessage(messagePayload);
       }
       updateData.status = 'revision';
+      break;
+    case 'cancelled':
+      if (existOrder.status !== 'delivery-confirmed') {
+        throw new CustomError.BadRequestError('Only delivery confirmed order can be cancelled!');
+      }
+      updateData.status = 'cancelled';
+      break;
+    case 'completed':
+      if (existOrder.status !== 'delivery-confirmed') {
+        throw new CustomError.BadRequestError('Only delivery confirmed order can be completed!');
+      }
+      updateData.status = 'completed';
+      break;
+    case 'rejected':
+      if (existOrder.status !== 'offered') {
+        throw new CustomError.BadRequestError('Only offered order can be rejected!');
+      }
+      updateData.status = 'rejected';
       break;
     default:
       throw new CustomError.BadRequestError('Invalid order status! Please provide a valid order status.');
