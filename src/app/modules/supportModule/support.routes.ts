@@ -8,6 +8,7 @@ supportRouter.post('/send-by-user', supportController.userCreateSupport);
 supportRouter.post('/reply-by-admin', authentication(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), supportController.adminReplySupport);
 supportRouter.get('/retrieve/all', supportController.getAllSupport);
 supportRouter.post('/compose-email', supportController.composeEmail);
+supportRouter.get('/retrieve/user/:userId', supportController.getSupportByUserId)
 supportRouter.get('/retrieve/:id', supportController.getSupportById);
 supportRouter.delete('/delete/:id', supportController.deleteSupportById);
 // supportRouter.delete('/delete/bulk', supportController.deleteAllSupports);

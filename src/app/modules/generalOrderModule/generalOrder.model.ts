@@ -14,8 +14,8 @@ const generalOrderSchema = new mongoose.Schema<IGeneralOrder>(
         }],
         status: {
             type: String,
-            enum: ['pending', 'process', 'deliverd', 'cancelled'],
-            default: 'pending',
+            enum: ['pending', 'process', 'delivered', 'cancelled'],
+            default: 'process',
         },
         paymentStatus: {
             type: String,

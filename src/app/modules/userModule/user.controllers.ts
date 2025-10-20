@@ -160,6 +160,8 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
   //     },
   //   });
 
+  //   console.log(stripeAccount)
+
   //   user.stripeAccountId = stripeAccount.id;
   //   await user.save();
   // }
@@ -276,10 +278,14 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
       }
 
       case ENUM_USER_ROLE.VENDOR: {
-        const location = {
-          type: 'Point',
-          coordinates: [Number(userData.lng), Number(userData.lat)],
+        let location;
+        if (userData.lng && userData.lat) {
+          location = {
+            type: 'Point',
+            coordinates: [Number(userData.lng), Number(userData.lat)],
+          }
         }
+
         const vendorUpdatePayload = {
           name: userData.name,
           address: userData.address,
@@ -291,6 +297,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
           rating: userData.rating,
           image: userData.image,
           location,
+          status: userData.status
         };
         updatedUser = await vendorServices.updateSpecificVendor(existingUser.profile.id as unknown as string, vendorUpdatePayload, session);
         await userServices.updateSpecificUser(id, userData, session);
@@ -307,7 +314,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    if (existingUser.profile.role === ENUM_USER_ROLE.CLIENT && userData.status === 'pending' && updatedUser.status === 'active') {
+    if (existingUser.profile.role === ENUM_USER_ROLE.VENDOR && userData.status === 'pending' && updatedUser.status === 'active') {
       // send email verification mail
       const content = `Your account now activated!`;
       // const verificationLink = `${server_base_url}/v1/auth/verify-email/${user._id}?userCode=${userData.verification.code}`
