@@ -16,7 +16,7 @@
     "generate:module": "ts-node src/scripts/generator/module"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.832.0",
+    "@aws-sdk/client-s3": "^3.913.0",
     "@aws-sdk/s3-presigned-post": "^3.832.0",
     "@types/cookie-parser": "^1.4.7",
     "bcrypt": "^5.1.1",
