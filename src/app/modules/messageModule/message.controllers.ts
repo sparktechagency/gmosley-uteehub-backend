@@ -13,9 +13,9 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 
 // Load your credentials from environment variables or config
-const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY || '';
-const AWS_SECRET = process.env.AWS_SECRET || '';
-const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME || '';
+const AWS_ACCESS_KEY = process.env.ACCESS_KEY_ID || '';
+const AWS_SECRET = process.env.SECRET_ACCESS_KEY || '';
+const AWS_BUCKET_NAME = process.env.BUCKET || '';
 
 // send message with rest..............
 const sendMessage = asyncHandler(async (req: Request, res: Response) => {
@@ -154,7 +154,7 @@ const getPresignedUrl = async (req: Request, res: Response) => {
       accessKeyId: AWS_ACCESS_KEY,
       secretAccessKey: AWS_SECRET,
     },
-    region: 'ap-south-1',
+    region: 'eu-north-1',
   });
 
   try {
