@@ -60,7 +60,7 @@ const withdrawMoneyFromWalletToVendorStripeAccount = asyncHandler(async (req: Re
   }
 
   const vendor = await userServices.getSpecificUser(vendorId);
-  console.log(vendor)
+  // console.log(vendor)
   if (!vendor || !vendor.stripeAccountId) {
     throw new CustomError.BadRequestError('Vendor Stripe account not found!');
   }
@@ -117,7 +117,47 @@ const withdrawMoneyFromWalletToVendorStripeAccount = asyncHandler(async (req: Re
   });
 });
 
+
+const regenerateOnboardingLink = asyncHandler(async (req: Request, res: Response) => {
+  const email = req.params.email; // assuming user is authenticated
+  const user = await userServices.getSpecificUserByEmail(email);
+  console.log(user)
+
+  if (!user || !user.stripeAccountId) {
+    throw new CustomError.BadRequestError('Vendor Stripe account not found!');
+  }
+
+  // Generate new onboarding link
+  const accountLink = await stripeClient.accountLinks.create({
+    account: user.stripeAccountId,
+    refresh_url: 'https://your-backend.com/api/vendor/onboarding/refresh',  // deep link for your app
+    return_url: 'https://your-backend.com/api/vendor/onboarding/complete',  // deep link for your app
+    type: 'account_onboarding',
+  });
+
+  user.stripeOnboardingLink = accountLink.url;
+  await user.save();
+
+  // send email
+  const content = `Your Stripe onboarding link has been regenerated.\nLink: ${accountLink.url}`;
+  const mailOptions = {
+    from: config.gmail_app_user as string,
+    to: user.email,
+    subject: 'U-Tee-Hub - Stripe Onboarding Link',
+    text: content,
+  };
+  sendMail(mailOptions);
+
+  return sendResponse(res, {
+    statusCode: 200,
+    status: 'success',
+    message: 'Stripe onboarding link email sended successfully.',
+    // data: { onboardingLink: accountLink.url },
+  });
+});
+
 export default {
   getSpecificWalletByUserId,
   withdrawMoneyFromWalletToVendorStripeAccount,
+  regenerateOnboardingLink,
 };

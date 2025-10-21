@@ -7,5 +7,6 @@ const walletRouter = express.Router();
 
 walletRouter.post('/withdraw', authorization(ENUM_USER_ROLE.VENDOR), walletControllers.withdrawMoneyFromWalletToVendorStripeAccount);
 walletRouter.get('/retrieve/user/:userId', walletControllers.getSpecificWalletByUserId);
+walletRouter.get('/regenerate-onboarding-link/:email', authorization(ENUM_USER_ROLE.VENDOR), walletControllers.regenerateOnboardingLink);
 
 export default walletRouter;

@@ -22,12 +22,11 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
 
   if (!user) throw new CustomError.BadRequestError('Invalid email or password!');
 
-//     const stripeAccount = await stripeClient.accounts.retrieve(user.stripeAccountId);
-// console.log(stripeAccount.capabilities)
-// if (stripeAccount.capabilities?.transfers !== 'active') {
-//   throw new CustomError.BadRequestError('Please complete Stripe onboarding. Check your email for the link.');
-// }
-
+  const stripeAccount = await stripeClient.accounts.retrieve(user.stripeAccountId);
+  // console.log(stripeAccount.capabilities)
+  if (stripeAccount.capabilities?.transfers !== 'active') {
+    throw new CustomError.BadRequestError('Please complete Stripe onboarding. Check your email for the link.');
+  }
 
   // check user disablility
   if (user.status === 'disabled') {
@@ -36,7 +35,7 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   if (user.status === 'blocked') {
     throw new CustomError.BadRequestError('Currently your account is blocked by admin!');
   }
-  if(user.status === 'pending'){
+  if (user.status === 'pending') {
     throw new CustomError.BadRequestError('Your account is not approved yet!');
   }
 

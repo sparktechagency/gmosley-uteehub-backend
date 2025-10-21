@@ -67,10 +67,10 @@ const getAllUser = async (
 const getSpecificUserByEmail = async (email: string): Promise<IUser> => {
   return await User.findOne({ email })
     .populate({
-      path: 'survey',
+      path: 'profile.id',
       select: '',
     })
-    .select('-password');
+    .select('-password -verification');
 };
 
 // service for update specific user
