@@ -60,6 +60,7 @@ const withdrawMoneyFromWalletToVendorStripeAccount = asyncHandler(async (req: Re
   }
 
   const vendor = await userServices.getSpecificUser(vendorId);
+  console.log(vendor)
   if (!vendor || !vendor.stripeAccountId) {
     throw new CustomError.BadRequestError('Vendor Stripe account not found!');
   }

@@ -10,6 +10,9 @@ import sendMail from '../../../../utils/sendEmail';
 import User from '../../userModule/user.model';
 import CustomError from '../../../errors';
 import asyncHandler from '../../../../shared/asyncHandler';
+import stripe from 'stripe';
+
+const stripeClient = new stripe(config.stripe_secret_key as string);
 
 // controller for user/outlet login
 const userLogin = asyncHandler(async (req: Request, res: Response) => {
@@ -18,6 +21,12 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   const user: any = await authServices.getUserByEmail(email);
 
   if (!user) throw new CustomError.BadRequestError('Invalid email or password!');
+
+    const stripeAccount = await stripeClient.accounts.retrieve(user.stripeAccountId);
+
+if (stripeAccount.capabilities?.transfers !== 'active') {
+  throw new CustomError.BadRequestError('Please complete Stripe onboarding. Check your email for the link.');
+}
 
   // check user disablility
   if (user.status === 'disabled') {
@@ -29,6 +38,7 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   if(user.status === 'pending'){
     throw new CustomError.BadRequestError('Your account is not approved yet!');
   }
+
 
   if (!isSocial) {
     // check the password is correct

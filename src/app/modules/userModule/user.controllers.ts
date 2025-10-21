@@ -148,23 +148,45 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
 
     sendMail(mailOptions);
   }
-
+  // console.log(userData.role, ENUM_USER_ROLE.VENDOR)
   // create stripe account for vendor (Apatotoo comment kore rakhchi, client theke stripe login kore nite hobe)
-  // if (userData.role === ENUM_USER_ROLE.VENDOR) {
-  //   const stripeAccount = await stripeClient.accounts.create({
-  //     type: 'express',
-  //     country: 'US',
-  //     email: userData.email,
-  //     business_profile: {
-  //       name: userData.name,
-  //     },
-  //   });
+  if (userData.role === ENUM_USER_ROLE.VENDOR) {
+    const stripeAccount = await stripeClient.accounts.create({
+      type: 'express',
+      country: 'US',
+      email: userData.email,
+      business_profile: {
+        name: userData.name,
+      },
+      capabilities: {
+        transfers: { requested: true }  // <-- request transfers capability
+      }
+    });
 
-  //   console.log(stripeAccount)
+    // console.log(stripeAccount)
 
-  //   user.stripeAccountId = stripeAccount.id;
-  //   await user.save();
-  // }
+    userInfoAcceptPass.stripeAccountId = stripeAccount.id;
+    user.stripeAccountId = stripeAccount.id;
+    await user.save();
+
+    // 2️⃣ Create Stripe onboarding link
+  const accountLink = await stripeClient.accountLinks.create({
+    account: stripeAccount.id,
+    refresh_url: 'https://yourapp.com/onboarding/refresh',
+    return_url: 'https://yourapp.com/onboarding/complete',
+    type: 'account_onboarding',
+  });
+console.log(accountLink)
+  // 3️⃣ Send onboarding link via email
+  const mailOptions = {
+    from: config.gmail_app_user as string,
+    to: userData.email,
+    subject: 'Complete Your Stripe Onboarding',
+    text: `Hi ${userData.name},\n\nPlease complete your Stripe onboarding to receive payouts:\n\n${accountLink.url}\n\nNote: This link is valid for 24 hours.`,
+  };
+
+  sendMail(mailOptions);
+  }
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,

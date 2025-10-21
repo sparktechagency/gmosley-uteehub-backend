@@ -49,6 +49,14 @@ export const userSchema = new mongoose.Schema<IUser>(
         default: null,
       },
     },
+    stripeOnboardingLink: {
+      type: String,
+      default: null,
+    },
+    isTransferActive: {
+      type: Boolean,
+      default: false,
+    },
     isSocial: {
       type: Boolean,
       default: false,
