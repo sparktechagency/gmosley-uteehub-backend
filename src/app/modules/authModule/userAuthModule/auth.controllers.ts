@@ -22,11 +22,12 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
 
   if (!user) throw new CustomError.BadRequestError('Invalid email or password!');
 
-    const stripeAccount = await stripeClient.accounts.retrieve(user.stripeAccountId);
+//     const stripeAccount = await stripeClient.accounts.retrieve(user.stripeAccountId);
+// console.log(stripeAccount.capabilities)
+// if (stripeAccount.capabilities?.transfers !== 'active') {
+//   throw new CustomError.BadRequestError('Please complete Stripe onboarding. Check your email for the link.');
+// }
 
-if (stripeAccount.capabilities?.transfers !== 'active') {
-  throw new CustomError.BadRequestError('Please complete Stripe onboarding. Check your email for the link.');
-}
 
   // check user disablility
   if (user.status === 'disabled') {
