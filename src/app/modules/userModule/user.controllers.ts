@@ -163,6 +163,8 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
       }
     });
 
+
+    
     // console.log(stripeAccount)
 
     userInfoAcceptPass.stripeAccountId = stripeAccount.id;
