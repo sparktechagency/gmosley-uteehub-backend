@@ -168,7 +168,9 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     // console.log(stripeAccount)
 
     userInfoAcceptPass.stripeAccountId = stripeAccount.id;
+    console.log(stripeAccount.id)
     user.stripeAccountId = stripeAccount.id;
+    console.log("user", user)
     await user.save();
 
     // 2️⃣ Create Stripe onboarding link
