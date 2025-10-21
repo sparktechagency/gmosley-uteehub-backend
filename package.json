@@ -5,7 +5,7 @@
   "type": "commonjs",
   "license": "MIT",
   "scripts": {
-    "start": "pm2 start ecosystem.config.json --no-daemon",
+    "start": "node dist/server.js",
     "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
