@@ -69,6 +69,15 @@ const withdrawMoneyFromWalletToVendorStripeAccount = asyncHandler(async (req: Re
     throw new CustomError.BadRequestError('Insufficient balance!');
   }
 
+  // from the last wallet transaction after 9 days vendor can't withdraw
+  const lastTransaction = wallet.transactionHistory[wallet.transactionHistory.length - 1];
+  const lastTransactionDate = new Date(lastTransaction.transactionAt);
+  const nowDate = new Date();
+  const diffInDays = Math.floor((nowDate.getTime() - lastTransactionDate.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffInDays < 9) {
+    throw new CustomError.BadRequestError('You will be able to withdraw after 9 days from the last transaction.');
+  }
+
   const stripeAmount = Math.round(amount * 100);
   const normalizedCurrency = currency.toLowerCase();
 
@@ -117,11 +126,10 @@ const withdrawMoneyFromWalletToVendorStripeAccount = asyncHandler(async (req: Re
   });
 });
 
-
 const regenerateOnboardingLink = asyncHandler(async (req: Request, res: Response) => {
   const email = req.params.email; // assuming user is authenticated
   const user = await userServices.getSpecificUserByEmail(email);
-  console.log(user)
+  // console.log(user)
 
   if (!user || !user.stripeAccountId) {
     throw new CustomError.BadRequestError('Vendor Stripe account not found!');
