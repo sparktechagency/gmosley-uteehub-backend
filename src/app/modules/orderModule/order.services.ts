@@ -14,7 +14,15 @@ class OrderService {
   retrieveAllOrders = async (
     query: Record<string, unknown>,
   ): Promise<{ meta: { page: number; limit: number; total: number; totalPages: number }; data: IOrder[] }> => {
-    const result = new QueryBuilder(Order.find({}), query).filter().search(['orderId']).sort().pagination().select();
+    const filter: Record<string, any> = {};
+
+    // Custom filter for nested field
+    if (query.extentionStatus) {
+      filter['extentionHistory.status'] = query.extentionStatus;
+      delete query.extentionStatus; // remove it from main query
+    }
+
+    const result = new QueryBuilder(Order.find(filter), query).filter().search(['orderId']).sort().pagination().select();
 
     const totalCount = await result.countTotal();
     const orders = await result.modelQuery;
