@@ -40,7 +40,7 @@ app.use(applyRateLimit());
 // application middleware
 app.use('/', routers);
 
-// send html design with a button 'click to see server health' and integrate an api to check server health
+// send html design with a button 'click to see server health' and integrate an api to check server healthh
 app.get('/', rootDesign);
 
 // swagger route
