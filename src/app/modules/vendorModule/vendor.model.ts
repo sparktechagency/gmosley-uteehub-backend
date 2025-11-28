@@ -82,7 +82,7 @@ export const vendorSchema = new mongoose.Schema<IVendor>(
       type: {
         type: String,
         enum: ['Point'],
-        // required: true,
+        required: true,
         default: 'Point',
       },
       coordinates: {
