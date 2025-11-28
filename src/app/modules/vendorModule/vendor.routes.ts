@@ -23,4 +23,5 @@ vendorRouter.get(
   vendorController.getNearestVendors,
 );
 
+
 export default vendorRouter;

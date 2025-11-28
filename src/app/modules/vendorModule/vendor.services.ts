@@ -11,6 +11,7 @@ const retrieveSpecificVendor = async (id: string, session?: ClientSession) => {
   return await Vendor.findById(id, { session });
 };
 
+
 const retrieveAllVendor = async (query: Record<string, unknown>, session?: ClientSession) => {
   return await Vendor.find(query, { session });
 };
@@ -28,6 +29,10 @@ const deleteSpecificVendor = async (id: string, session?: ClientSession) => {
 
 // service for retrieve nearest vendor
 const retrieveNearestVendor = async (clientLocation: string) => {
+  const populateOptions = { path: 'userId', select: 'name email phone' };
+    if (!clientLocation) {
+    return await Vendor.find({}).populate(populateOptions);
+  }
   let [first, second] = clientLocation.split(', ').map(Number);
 
   let lat = first > 90 ? second : first;
@@ -43,7 +48,7 @@ const retrieveNearestVendor = async (clientLocation: string) => {
         $maxDistance: 1000, // in meters
       },
     },
-  }).populate('userId', 'name email phone');
+  }).populate(populateOptions);
 };
 
 
@@ -54,4 +59,5 @@ export default {
   retrieveSpecificVendor,
   retrieveAllVendor,
   retrieveNearestVendor,
+
 };
