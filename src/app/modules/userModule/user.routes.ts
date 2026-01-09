@@ -6,12 +6,7 @@ import authentication from '../../middlewares/authorization';
 
 const userRouter = express.Router();
 
-
-userRouter.post(
-  '/create',
-  requestValidator(UserValidationZodSchema.createUserZodSchema),
-  userControllers.createUser
-);
+userRouter.post('/create', requestValidator(UserValidationZodSchema.createUserZodSchema), userControllers.createUser);
 userRouter.post('/file-upload', userControllers.fileUpload);
 userRouter.get('/retrieve/all', userControllers.getAllUser);
 
@@ -24,6 +19,8 @@ userRouter.patch(
   userControllers.updateSpecificUser,
 );
 
+userRouter.patch('/update-status/:id', requestValidator(UserValidationZodSchema.updateUserStatusSchema), userControllers.updateUserStatus);
+
 // userRouter.delete(
 //   '/delete/:id',
 //   //   authentication('user', 'admin'),
@@ -31,7 +28,5 @@ userRouter.patch(
 //   userControllers.deleteSpecificUser,
 // );
 // userRouter.patch('/update/profile-picture/:id', authentication('patient', 'therapist'), requestValidator(UserValidationZodSchema.getSpecificUserZodSchema), userControllers.changeUserProfileImage)
-
-
 
 export default userRouter;

@@ -42,8 +42,6 @@ class OrderService {
       delete query.extentionStatus; // remove it from main query
     }
 
-  
-
     const result = new QueryBuilder(Order.find(filter), query).filter().search(['orderId']).sort().pagination().select();
 
     const totalCount = await result.countTotal();

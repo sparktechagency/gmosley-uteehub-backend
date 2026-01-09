@@ -45,16 +45,13 @@ const createUserZodSchema = z.object({
     verification: z
       .object({
         code: z.string().nullable().optional(),
-        expireDate: z
-          .preprocess((val) => (val ? new Date(val as string) : null), z.date().nullable())
-          .optional(),
+        expireDate: z.preprocess((val) => (val ? new Date(val as string) : null), z.date().nullable()).optional(),
       })
       .optional(),
 
     fcmToken: z.string().nullable().optional(),
   }),
 });
-
 
 const getSpecificUserZodSchema = z.object({
   params: z.object({
@@ -64,9 +61,21 @@ const getSpecificUserZodSchema = z.object({
   }),
 });
 
+const updateUserStatusSchema = z.object({
+  params: z.object({
+    id: z.string({
+      required_error: 'User ID is missing in request params!',
+    }),
+  }),
+  body: z.object({
+    status: statusEnum,
+  }),
+});
+
 const UserValidationZodSchema = {
   createUserZodSchema,
   getSpecificUserZodSchema,
+  updateUserStatusSchema,
 };
 
 export default UserValidationZodSchema;

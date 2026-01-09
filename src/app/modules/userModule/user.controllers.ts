@@ -159,37 +159,35 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
         name: userData.name,
       },
       capabilities: {
-        transfers: { requested: true }  // <-- request transfers capability
-      }
+        transfers: { requested: true }, // <-- request transfers capability
+      },
     });
 
-
-    
     // console.log(stripeAccount)
 
     userInfoAcceptPass.stripeAccountId = stripeAccount.id;
-    console.log(stripeAccount.id)
+    console.log(stripeAccount.id);
     user.stripeAccountId = stripeAccount.id;
-    console.log("user", user)
+    console.log('user', user);
     await user.save();
 
     // 2️⃣ Create Stripe onboarding link
-  const accountLink = await stripeClient.accountLinks.create({
-    account: stripeAccount.id,
-    refresh_url: 'https://yourapp.com/onboarding/refresh',
-    return_url: 'https://yourapp.com/onboarding/complete',
-    type: 'account_onboarding',
-  });
-console.log(accountLink)
-  // 3️⃣ Send onboarding link via email
-  const mailOptions = {
-    from: config.gmail_app_user as string,
-    to: userData.email,
-    subject: 'Complete Your Stripe Onboarding',
-    text: `Hi ${userData.name},\n\nPlease complete your Stripe onboarding to receive payouts:\n\n${accountLink.url}\n\nNote: This link is valid for 24 hours.`,
-  };
+    const accountLink = await stripeClient.accountLinks.create({
+      account: stripeAccount.id,
+      refresh_url: 'https://yourapp.com/onboarding/refresh',
+      return_url: 'https://yourapp.com/onboarding/complete',
+      type: 'account_onboarding',
+    });
+    console.log(accountLink);
+    // 3️⃣ Send onboarding link via email
+    const mailOptions = {
+      from: config.gmail_app_user as string,
+      to: userData.email,
+      subject: 'Complete Your Stripe Onboarding',
+      text: `Hi ${userData.name},\n\nPlease complete your Stripe onboarding to receive payouts:\n\n${accountLink.url}\n\nNote: This link is valid for 24 hours.`,
+    };
 
-  sendMail(mailOptions);
+    sendMail(mailOptions);
   }
 
   sendResponse(res, {
@@ -309,7 +307,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
           location = {
             type: 'Point',
             coordinates: [Number(userData.lng), Number(userData.lat)],
-          }
+          };
         }
 
         const vendorUpdatePayload = {
@@ -323,7 +321,7 @@ const updateSpecificUser = asyncHandler(async (req: Request, res: Response) => {
           rating: userData.rating,
           image: userData.image,
           location,
-          status: userData.status
+          status: userData.status,
         };
         updatedUser = await vendorServices.updateSpecificVendor(existingUser.profile.id as unknown as string, vendorUpdatePayload, session);
         await userServices.updateSpecificUser(id, userData, session);
@@ -381,8 +379,20 @@ const fileUpload = asyncHandler(async (req: Request, res: Response) => {
     message: 'File uploaded successfully',
     data: imagePath,
   });
-})
+});
 
+const updateUserStatus = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const status = req.body.status;
+
+  const result = await userServices.updateUserStatus(id, status);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'User status updated successfully',
+    data: result,
+  });
+});
 export default {
   createUser,
   getSpecificUser,
@@ -391,4 +401,5 @@ export default {
   updateSpecificUser,
   // changeUserProfileImage,
   fileUpload,
+  updateUserStatus,
 };
