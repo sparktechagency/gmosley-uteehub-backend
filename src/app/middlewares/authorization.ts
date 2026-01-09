@@ -21,7 +21,7 @@ const authentication = (...requiredRoles: string[]) => {
       }
       req.user = userPayload;
 
-      console.log(userPayload, requiredRoles)
+      console.log(userPayload);
 
       // Guard for check authentication
       if (requiredRoles.length && !requiredRoles.includes(userPayload.role)) {

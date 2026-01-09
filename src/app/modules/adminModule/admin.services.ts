@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+import User from '../userModule/user.model';
 import IAdmin from './admin.interface';
 import Admin from './admin.model';
 
@@ -23,7 +25,7 @@ const getAdminByEmail = async (email: string) => {
 
 // service for update specific admin
 const updateSpecificAdmin = async (id: string, data: Partial<IAdmin>) => {
-    console.log(data)
+  console.log(data);
   return await Admin.updateOne({ _id: id }, data, {
     runValidators: true,
   });
@@ -33,13 +35,35 @@ const updateSpecificAdmin = async (id: string, data: Partial<IAdmin>) => {
 const deleteSpecificAdmin = async (id: string) => {
   return await Admin.deleteOne({ _id: id });
 };
+const blockSpecificAdmin = async (id: string) => {
+  const admin = await Admin.findById(id);
 
+  if (admin?.status === 'blocked') {
+    throw Error('Admin has already been blocked!');
+  }
+  if (!admin) {
+    throw new Error(`User doesn't exists!`);
+  }
+
+  return await Admin.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    {
+      status: 'blocked',
+    },
+    {
+      new: true,
+    },
+  ).select('status profile');
+};
 
 export default {
-    createAdmin,
-    getAllAdmin,
-    getSpecificAdmin,
-    getAdminByEmail,
-    updateSpecificAdmin,
-    deleteSpecificAdmin
-}
+  createAdmin,
+  getAllAdmin,
+  getSpecificAdmin,
+  getAdminByEmail,
+  updateSpecificAdmin,
+  deleteSpecificAdmin,
+  blockSpecificAdmin,
+};

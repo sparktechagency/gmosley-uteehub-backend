@@ -91,10 +91,23 @@ const deleteSpecificAdmin = asyncHandler(async (req: Request, res: Response) => 
   });
 });
 
+const blockSpecificAdmin = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  const result = await adminServices.blockSpecificAdmin(id);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'Admin blocked successfully!',
+    data: result,
+  });
+});
+
 export default {
   createAdmin,
   getAllAdmin,
   getSpecificAdmin,
   updateSpecificAdmin,
   deleteSpecificAdmin,
+  blockSpecificAdmin,
 };

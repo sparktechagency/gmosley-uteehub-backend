@@ -3,6 +3,7 @@ import userControllers from './user.controllers';
 import UserValidationZodSchema from './user.validation';
 import requestValidator from '../../middlewares/requestValidator';
 import authentication from '../../middlewares/authorization';
+import { ENUM_USER_ROLE } from '../../../enums/user';
 
 const userRouter = express.Router();
 
@@ -14,12 +15,17 @@ userRouter.get('/retrieve/:id', requestValidator(UserValidationZodSchema.getSpec
 
 userRouter.patch(
   '/update/:id',
-  //   authentication('user', 'admin'),
+  authentication('user', 'admin'),
   requestValidator(UserValidationZodSchema.getSpecificUserZodSchema),
   userControllers.updateSpecificUser,
 );
 
-userRouter.patch('/update-status/:id', requestValidator(UserValidationZodSchema.updateUserStatusSchema), userControllers.updateUserStatus);
+userRouter.patch(
+  '/update-status/:id',
+  authentication(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  requestValidator(UserValidationZodSchema.updateUserStatusSchema),
+  userControllers.updateUserStatus,
+);
 
 // userRouter.delete(
 //   '/delete/:id',
