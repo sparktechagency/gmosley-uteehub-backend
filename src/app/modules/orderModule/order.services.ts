@@ -16,11 +16,33 @@ class OrderService {
   ): Promise<{ meta: { page: number; limit: number; total: number; totalPages: number }; data: IOrder[] }> => {
     const filter: Record<string, any> = {};
 
+    if (query?.status || query.status === '') {
+      const queryStatus = query.status;
+      if (queryStatus === 'rejected' || queryStatus === 'cancelled') {
+        filter.status = {
+          $in: ['rejected', 'cancelled'],
+        };
+      } else if (query?.status) {
+        filter.status = queryStatus;
+      }
+      delete query.status;
+    }
+
+    if (query?.deliveryOption || query.deliveryOption === '') {
+      if (query?.deliveryOption) {
+        filter.deliveryOption = query.deliveryOption;
+      }
+
+      delete query.deliveryOption;
+    }
+
     // Custom filter for nested field
     if (query.extentionStatus) {
       filter['extentionHistory.status'] = query.extentionStatus;
       delete query.extentionStatus; // remove it from main query
     }
+
+  
 
     const result = new QueryBuilder(Order.find(filter), query).filter().search(['orderId']).sort().pagination().select();
 
