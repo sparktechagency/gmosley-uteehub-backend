@@ -103,6 +103,18 @@ const blockSpecificAdmin = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const getDashboardStats = asyncHandler(async (req: Request, res: Response) => {
+  const clientYear = req.query.clientYear;
+  const result = await adminServices.getDashboardStats();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    status: 'success',
+    message: 'Admin analytics retrieved successfully!',
+    data: result,
+  });
+});
+
 export default {
   createAdmin,
   getAllAdmin,
@@ -110,4 +122,5 @@ export default {
   updateSpecificAdmin,
   deleteSpecificAdmin,
   blockSpecificAdmin,
+  getDashboardStats,
 };

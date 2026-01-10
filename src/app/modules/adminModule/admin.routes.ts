@@ -2,6 +2,8 @@ import express from 'express';
 import adminControllers from './admin.controllers';
 import authentication from '../../middlewares/authorization';
 import { ENUM_USER_ROLE } from '../../../enums/user';
+import requestValidator from '../../middlewares/requestValidator';
+import { getDashboardAnalytics } from './admin.validation';
 
 const adminRouter = express.Router();
 
@@ -18,6 +20,8 @@ adminRouter.delete(
   // authorization('super-admin'),
   adminControllers.deleteSpecificAdmin,
 );
+
+adminRouter.get('/dashboard', requestValidator(getDashboardAnalytics), adminControllers.getDashboardStats);
 
 adminRouter.patch('/block/:id', authentication(ENUM_USER_ROLE.SUPER_ADMIN), adminControllers.blockSpecificAdmin);
 
