@@ -104,8 +104,8 @@ const blockSpecificAdmin = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getDashboardStats = asyncHandler(async (req: Request, res: Response) => {
-  const clientYear = req.query.clientYear;
-  const result = await adminServices.getDashboardStats();
+  const clientYear = req.query.clientYear as string;
+  const result = await adminServices.getDashboardStats(clientYear);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

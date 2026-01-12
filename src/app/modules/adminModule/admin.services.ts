@@ -86,8 +86,17 @@ const blockSpecificAdmin = async (id: string) => {
 // Get admin dashboard stats:
 
 const getDashboardStats = async (clientYear: string = '2025') => {
+  const newClientYear = clientYear || new Date().getFullYear();
   const [clients, vendors, customOrdersCount, productOrdersCount, customEarnings, generalEarnings, customFeeStats] = await Promise.all([
     await Client.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${newClientYear}-01-01`),
+            $lte: new Date(`${newClientYear}-12-31`),
+          },
+        },
+      },
       {
         $group: {
           _id: null,
@@ -97,23 +106,69 @@ const getDashboardStats = async (clientYear: string = '2025') => {
     ]),
     await Vendor.aggregate([
       {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${newClientYear}-01-01`),
+            $lte: new Date(`${newClientYear}-12-31`),
+          },
+        },
+      },
+      {
         $group: {
           _id: null,
           count: { $sum: 1 },
         },
       },
     ]),
-    await Order.countDocuments(),
-    await GeneralOrder.countDocuments(),
-    await Order.aggregate([{ $match: { status: 'delivery-confirmed' } }, { $group: { _id: null, total: { $sum: '$price' } } }]),
-    await GeneralOrder.aggregate([{ $match: { paymentStatus: 'paid' } }, { $group: { _id: null, total: { $sum: '$price' } } }]),
+    await Order.countDocuments({
+      createdAt: {
+        $gte: new Date(`${newClientYear}-01-01`),
+        $lte: new Date(`${newClientYear}-12-31`),
+      },
+    }),
+    await GeneralOrder.countDocuments({
+      createdAt: {
+        $gte: new Date(`${newClientYear}-01-01`),
+        $lte: new Date(`${newClientYear}-12-31`),
+      },
+    }),
     await Order.aggregate([
-      { $match: { status: 'delivery-confirmed' } },
+      {
+        $match: {
+          status: 'delivery-confirmed',
+          createdAt: {
+            $gte: new Date(`${newClientYear}-01-01`),
+            $lte: new Date(`${newClientYear}-12-31`),
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: '$price' } } },
+    ]),
+    await GeneralOrder.aggregate([
+      {
+        $match: {
+          paymentStatus: 'paid',
+          createdAt: {
+            $gte: new Date(`${newClientYear}-01-01`),
+            $lte: new Date(`${newClientYear}-12-31`),
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: '$price' } } },
+    ]),
+    await Order.aggregate([
+      {
+        $match: {
+          status: 'delivery-confirmed',
+          createdAt: {
+            $gte: new Date(`${newClientYear}-01-01`),
+            $lte: new Date(`${newClientYear}-12-31`),
+          },
+        },
+      },
       { $group: { _id: null, totalFees: { $sum: { $multiply: ['$price', 0.2] } } } },
     ]),
   ]);
-
-  const newClientYear = clientYear || new Date().getFullYear();
 
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -158,16 +213,34 @@ const getDashboardStats = async (clientYear: string = '2025') => {
   ]);
 
   const stats = await Order.aggregate([
-    
     // 1. Filter successful Custom Orders
-    { $match: { status: 'delivery-confirmed' } },
+    {
+      $match: {
+        status: 'delivery-confirmed',
+        createdAt: {
+          $gte: new Date(`${newClientYear}-01-01`),
+          $lte: new Date(`${newClientYear}-12-31`),
+        },
+      },
+    },
     { $project: { price: 1, createdAt: 1 } },
 
     // 2. Combine with General Orders (Product Sales)
     {
       $unionWith: {
         coll: 'generalorders', // The actual name of the collection in MongoDB
-        pipeline: [{ $match: { paymentStatus: 'paid' } }, { $project: { price: 1, createdAt: 1 } }],
+        pipeline: [
+          {
+            $match: {
+              paymentStatus: 'paid',
+              createdAt: {
+                $gte: new Date(`${newClientYear}-01-01`),
+                $lte: new Date(`${newClientYear}-12-31`),
+              },
+            },
+          },
+          { $project: { price: 1, createdAt: 1 } },
+        ],
       },
     },
 
