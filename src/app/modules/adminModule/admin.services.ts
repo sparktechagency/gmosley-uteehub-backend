@@ -44,24 +44,35 @@ const deleteSpecificAdmin = async (id: string) => {
 const blockSpecificAdmin = async (id: string) => {
   const admin = await Admin.findById(id);
 
-  if (admin?.status === 'blocked') {
-    throw Error('Admin has already been blocked!');
-  }
   if (!admin) {
     throw new Error(`User doesn't exists!`);
   }
 
-  return await Admin.findOneAndUpdate(
-    {
-      _id: id,
-    },
-    {
-      status: 'blocked',
-    },
-    {
-      new: true,
-    },
-  ).select('status profile');
+  if (admin?.status === 'blocked') {
+    return await Admin.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        status: 'active',
+      },
+      {
+        new: true,
+      },
+    ).select('status profile');
+  } else {
+    return await Admin.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        status: 'blocked',
+      },
+      {
+        new: true,
+      },
+    ).select('status profile');
+  }
 };
 
 // Get admin dashboard stats:
