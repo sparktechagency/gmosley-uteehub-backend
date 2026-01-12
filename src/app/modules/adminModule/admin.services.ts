@@ -158,6 +158,7 @@ const getDashboardStats = async (clientYear: string = '2025') => {
   ]);
 
   const stats = await Order.aggregate([
+    
     // 1. Filter successful Custom Orders
     { $match: { status: 'delivery-confirmed' } },
     { $project: { price: 1, createdAt: 1 } },
