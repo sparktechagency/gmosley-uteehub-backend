@@ -98,8 +98,8 @@ const blockSpecificAdmin = asyncHandler(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     status: 'success',
-    message: 'Admin blocked successfully!',
-    data: result,
+    message: result.message,
+    data: result.data,
   });
 });
 

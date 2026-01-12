@@ -49,7 +49,7 @@ const blockSpecificAdmin = async (id: string) => {
   }
 
   if (admin?.status === 'blocked') {
-    return await Admin.findOneAndUpdate(
+    const res = await Admin.findOneAndUpdate(
       {
         _id: id,
       },
@@ -60,8 +60,12 @@ const blockSpecificAdmin = async (id: string) => {
         new: true,
       },
     ).select('status profile');
+    return {
+      message: `Activate admin successfully!`,
+      data: res,
+    };
   } else {
-    return await Admin.findOneAndUpdate(
+    const res = await Admin.findOneAndUpdate(
       {
         _id: id,
       },
@@ -72,6 +76,10 @@ const blockSpecificAdmin = async (id: string) => {
         new: true,
       },
     ).select('status profile');
+    return {
+      message: `Admin blocked successfully!!`,
+      data: res,
+    };
   }
 };
 
