@@ -1,8 +1,8 @@
 import z from 'zod';
 
-const statusEnum = z.enum(['active', 'blocked', 'disabled'], {
+const statusEnum = z.enum(['active', 'blocked', 'pending'], {
   required_error: 'Status is required!',
-  invalid_type_error: 'Invalid status type. Allowed values are active, blocked, or disabled.',
+  invalid_type_error: 'Invalid status type. Allowed values are active, blocked, or pending.',
 });
 
 const createUserZodSchema = z.object({
