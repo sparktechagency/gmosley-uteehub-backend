@@ -102,9 +102,9 @@ class SupportController {
     const { userId } = req.params;
     const support = await supportServices.getSupportByUserId(userId);
 
-    if (!support) {
-      throw new CustomError.NotFoundError('No support thread found for this user');
-    }
+    // if (!support) {
+    //   throw new CustomError.NotFoundError('No support thread found for this user');
+    // }
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,
