@@ -15,7 +15,7 @@ userRouter.get('/retrieve/:id', requestValidator(UserValidationZodSchema.getSpec
 
 userRouter.patch(
   '/update/:id',
-  authentication('user', 'admin'),
+  authentication(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.VENDOR),
   requestValidator(UserValidationZodSchema.getSpecificUserZodSchema),
   userControllers.updateSpecificUser,
 );
