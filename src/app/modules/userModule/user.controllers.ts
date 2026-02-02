@@ -174,8 +174,8 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     // 2️⃣ Create Stripe onboarding link
     const accountLink = await stripeClient.accountLinks.create({
       account: stripeAccount.id,
-      refresh_url: 'https://yourapp.com/onboarding/refresh',
-      return_url: 'https://yourapp.com/onboarding/complete',
+      refresh_url: 'https://uteehub.com/onboarding/refresh',
+      return_url: 'https://uteehub.com/onboarding/complete',
       type: 'account_onboarding',
     });
     console.log(accountLink);
