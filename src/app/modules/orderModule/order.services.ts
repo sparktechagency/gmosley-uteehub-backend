@@ -18,13 +18,13 @@ class OrderService {
 
     if (query?.status || query.status === '') {
       const queryStatus = query.status;
-      if (queryStatus === 'rejected' || queryStatus === 'cancelled') {
-        filter.status = {
-          $in: ['rejected', 'cancelled'],
-        };
-      } else if (query?.status) {
-        filter.status = queryStatus;
-      }
+      // if (queryStatus === 'rejected' || queryStatus === 'cancelled') {
+      //   filter.status = {
+      //     $in: ['rejected', 'cancelled'],
+      //   };
+      // } else if (query?.status) {
+      filter.status = queryStatus;
+      // }
       delete query.status;
     }
 
@@ -39,7 +39,7 @@ class OrderService {
     // Custom filter for nested field
     if (query.extentionStatus) {
       filter['extentionHistory.status'] = query.extentionStatus;
-      delete query.extentionStatus; // remove it from main query
+      delete query.extentionStatus;
     }
 
     const result = new QueryBuilder(Order.find(filter), query).filter().search(['orderId']).sort().pagination().select();
