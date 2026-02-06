@@ -12,6 +12,7 @@ import conversationService from '../conversationModule/conversation.service';
 import messageServices from '../messageModule/message.services';
 import walletServices from '../walletModule/wallet.services';
 import notificationServices from '../notificationModule/notification.services';
+import { createNotification } from '../notificationModule/notification.utils';
 
 const stripe = new Stripe(config.stripe_secret_key as string);
 
@@ -152,6 +153,7 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
         };
         await messageServices.createMessage(messagePayload);
       }
+
       break;
     case 'delivery-confirmed':
       if (existOrder.status !== 'delivery-requested') {
@@ -200,12 +202,35 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
         await messageServices.createMessage(messagePayload);
       }
       updateData.status = 'revision';
+      await createNotification({
+        consumer: existOrder.vendor,
+        content: {
+          title: 'Revision Requested',
+          message: 'The client has requested a revision for this order.',
+          source: {
+            type: 'order',
+            id: existOrder._id,
+          },
+        },
+      });
       break;
     case 'cancelled':
       if (existOrder.status !== 'delivery-confirmed') {
         throw new CustomError.BadRequestError('Only delivery confirmed order can be cancelled!');
       }
+
       updateData.status = 'cancelled';
+      await createNotification({
+        consumer: existOrder.vendor,
+        content: {
+          title: 'Order Cancelled',
+          message: 'The client has cancelled your order offer.',
+          source: {
+            type: 'order',
+            id: existOrder._id,
+          },
+        },
+      });
       break;
     case 'completed':
       if (existOrder.status !== 'delivery-confirmed') {
@@ -218,6 +243,17 @@ const updateSpecificOrder = asyncHandler(async (req: Request, res: Response) => 
         throw new CustomError.BadRequestError('Only offered order can be rejected!');
       }
       updateData.status = 'rejected';
+      await createNotification({
+        consumer: existOrder.vendor,
+        content: {
+          title: 'Order Rejected',
+          message: 'The client has rejected your order offer.',
+          source: {
+            type: 'order',
+            id: existOrder._id,
+          },
+        },
+      });
       break;
     default:
       throw new CustomError.BadRequestError('Invalid order status! Please provide a valid order status.');

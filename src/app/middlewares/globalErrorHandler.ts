@@ -25,7 +25,12 @@ const prodErrorResponse = (error: ICustomError, res: Response): Response => {
 const globalErrorHandler = (err: ICustomError, req: Request, res: Response, next: NextFunction): void => {
   err.statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   err.message = err.message || 'Something went wrong, try again later';
-  res.locals.errorMessage = err.message; 
+  res.locals.errorMessage = err.message;
+
+  if (err?.statusCode === 413) {
+    err.statusCode = 413;
+    err.message = 'File size too large. Maximum allowed size is 5 MB';
+  }
 
   // Handle Mongoose ValidationError
   if (err.name === 'ValidationError' && err.errors) {

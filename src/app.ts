@@ -33,7 +33,13 @@ if (config.node_env !== 'test') {
 app.use(cookieParser());
 app.use(compression(compressionOptions));
 app.use(helmetConfig);
-app.use(fileUpload());
+app.use(
+  fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 }, // 5 MB
+    abortOnLimit: true, // IMPORTANT
+    // createParentPath: true,
+  }),
+);
 app.use('/v1/uploads', express.static(path.join('uploads')));
 app.use(applyRateLimit());
 
