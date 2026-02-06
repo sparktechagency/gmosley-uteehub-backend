@@ -3,7 +3,7 @@
 
 import mongoose from 'mongoose';
 import { IVendor } from './vendor.interface';
-
+import { devliveryOptions } from '../orderModule/order.constants';
 
 export const vendorSchema = new mongoose.Schema<IVendor>(
   {
@@ -24,7 +24,7 @@ export const vendorSchema = new mongoose.Schema<IVendor>(
     deliveryOption: [
       {
         type: String,
-        enum: ['pickup', 'courier', 'pickupAndCourier'],
+        enum: devliveryOptions,
       },
     ],
     documents: {

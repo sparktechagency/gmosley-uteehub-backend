@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { IOrder } from './order.interface';
+import { DELIVERY_OPTIONS, devliveryOptions } from './order.constants';
 
 export const orderSchema = new mongoose.Schema<IOrder>(
   {
@@ -83,8 +84,8 @@ export const orderSchema = new mongoose.Schema<IOrder>(
     },
     deliveryOption: {
       type: String,
-      enum: ['pickup', 'courier', 'pickupAndCourier'],
-      default: 'pickup',
+      enum: devliveryOptions,
+      default: DELIVERY_OPTIONS.pickup,
     },
     summery: {
       type: String,
