@@ -17,6 +17,7 @@ class GeneralOrderService {
     };
     data: IGeneralOrder[];
   }> {
+    console.log(query);
     const result = new QueryBuilder(
       GeneralOrder.find({})
         .populate({ path: 'client', select: 'profile email phone', populate: { path: 'profile.id', select: 'name gender image -_id' } })
@@ -25,7 +26,7 @@ class GeneralOrderService {
       query,
     )
       .filter()
-      .search(['name'])
+      .search(['tnxId'])
       .sort()
       .pagination()
       .select();
