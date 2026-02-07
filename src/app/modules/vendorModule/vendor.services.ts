@@ -43,7 +43,7 @@ const retrieveNearestVendor = async (clientLocation: string) => {
           type: 'Point',
           coordinates: [lng, lat], // MongoDB expects [lng, lat]
         },
-        $maxDistance: 1000, // in meters
+        $maxDistance: 1000000, // in meters
       },
     },
   }).populate(populateOptions);

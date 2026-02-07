@@ -40,6 +40,7 @@ app.use(
     // createParentPath: true,
   }),
 );
+
 app.use('/v1/uploads', express.static(path.join('uploads')));
 app.use(applyRateLimit());
 
